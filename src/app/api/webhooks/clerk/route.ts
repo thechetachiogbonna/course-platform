@@ -3,7 +3,7 @@ import {
   deleteUser,
   syncDBUserToClerk,
   updateUser,
-} from "@/features/user/action";
+} from "@/features/users/action";
 import { verifyWebhook } from "@clerk/nextjs/webhooks";
 import { NextRequest } from "next/server";
 
@@ -14,10 +14,7 @@ export async function POST(req: NextRequest) {
     switch (evt.type) {
       case "user.created":
       case "user.updated": {
-        const role = (evt.data.public_metadata.role || "user") as Pick<
-          User,
-          "role"
-        >["role"];
+        const role = evt.data.public_metadata.role || "user";
 
         if (evt.type === "user.created") {
           const result = await createUser({

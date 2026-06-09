@@ -7,4 +7,9 @@ declare global {
       role?: "user" | "admin";
     };
   }
+
+  interface UserPublicMetadata {
+    dbId?: string,
+    role?: "user" | "admin";
+  }
 }

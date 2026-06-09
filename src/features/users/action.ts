@@ -92,7 +92,7 @@ export const syncDBUserToClerk = async ({
   clerkUserId,
 }: {
   userId: string;
-  role: string;
+  role: "admin" | "user";
   clerkUserId: string;
 }) => {
   const client = await clerkClient();

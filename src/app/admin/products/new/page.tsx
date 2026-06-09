@@ -1,5 +1,18 @@
 import ProductForm from "@/components/admin/ProductForm";
+import { db } from "@/database/db";
 
-export default function NewProductPage() {
-  return <ProductForm />;
+const getAvailableCourse = async () => {
+  const result = await db.query(`
+    SELECT
+      *
+    FROM courses
+    ORDER BY updated_at DESC
+  `);
+
+  return result.rows;
+};
+
+export default async function NewProductPage() {
+  const courses = await getAvailableCourse();
+  return <ProductForm courses={courses} />;
 }

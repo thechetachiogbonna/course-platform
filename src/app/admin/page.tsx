@@ -1,69 +1,73 @@
-"use client";
-
-import React, { useState, useMemo } from "react";
 import {
   Plus,
   Search,
-  SlidersHorizontal,
-  AlertTriangle,
-  Eye,
-  EyeOff,
-  TrendingUp,
   Edit3,
-  BarChart4,
-  Sparkles,
   Layers,
-  CheckCircle2,
-  XSquare,
+  SlidersHorizontal
 } from "lucide-react";
-import { INITIAL_PRODUCTS } from "../constants";
 import Link from "next/link";
+import { db } from "@/database/db";
 
-interface ProductsProps {
-  products: Product[];
+const getAllProducts = async () => {
+  const result = await db.query(`
+    SELECT
+      p.*,
+      coalesce(
+        jsonb_agg(to_jsonb(c) ORDER BY c.name),
+        '[]'::jsonb
+      ) AS courses
+    FROM products AS p
+    LEFT JOIN course_products AS cp
+      ON p.id = cp.product_id
+    LEFT JOIN courses AS c
+      ON cp.course_id = c.id
+    GROUP BY p.id
+    ORDER BY p.name
+  `)
+  return result.rows
 }
 
-export default function ProductsPage({
-  products = INITIAL_PRODUCTS,
-}: ProductsProps) {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filterStatus, setFilterStatus] = useState<
-    "All" | "Public" | "Private"
-  >("All");
-  const [selectedProductForAnalytics, setSelectedProductForAnalytics] =
-    useState<Product | null>(null);
+export default async function ProductsPage() {
+  const products = await getAllProducts();
+  console.log(products)
+  // const [searchQuery, setSearchQuery] = useState("");
+  // const [filterStatus, setFilterStatus] = useState<
+  //   "All" | "Public" | "Private"
+  // >("All");
+  // const [selectedProductForAnalytics, setSelectedProductForAnalytics] =
+  //   useState<Product | null>(null);
 
-  // Filter products based on search and status filter
-  const filteredProducts = useMemo(() => {
-    return products.filter((p) => {
-      const matchesSearch =
-        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.sku.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.description.toLowerCase().includes(searchQuery.toLowerCase());
+  // // Filter products based on search and status filter
+  // const filteredProducts = useMemo(() => {
+  //   return products.filter((p) => {
+  //     const matchesSearch =
+  //       p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  //       p.sku.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  //       p.description.toLowerCase().includes(searchQuery.toLowerCase());
 
-      const matchesFilter =
-        filterStatus === "All" ? true : p.status === filterStatus;
+  //     const matchesFilter =
+  //       filterStatus === "All" ? true : p.status === filterStatus;
 
-      return matchesSearch && matchesFilter;
-    });
-  }, [products, searchQuery, filterStatus]);
+  //     return matchesSearch && matchesFilter;
+  //   });
+  // }, [products, searchQuery, filterStatus]);
 
-  // Compute stats based on the products dynamically
-  const stats = useMemo(() => {
-    const baseSkus = 120 + products.length;
-    const basePublic =
-      80 + products.filter((p) => p.status === "Public").length;
+  // // Compute stats based on the products dynamically
+  // const stats = useMemo(() => {
+  //   const baseSkus = 120 + products.length;
+  //   const basePublic =
+  //     80 + products.filter((p) => p.status === "Public").length;
 
-    // Sum prices
-    const sumPrices = products.reduce((total, p) => total + p.price, 0);
-    const formattedValue = `$${((412500 + sumPrices) / 1000).toFixed(1)}k`;
+  //   // Sum prices
+  //   const sumPrices = products.reduce((total, p) => total + p.price, 0);
+  //   const formattedValue = `$${((412500 + sumPrices) / 1000).toFixed(1)}k`;
 
-    return {
-      skus: baseSkus,
-      publicListings: basePublic,
-      value: formattedValue,
-    };
-  }, [products]);
+  //   return {
+  //     skus: baseSkus,
+  //     publicListings: basePublic,
+  //     value: formattedValue,
+  //   };
+  // }, [products]);
 
   return (
     <div className="flex-1 w-full space-y-8 pb-16">
@@ -89,7 +93,7 @@ export default function ProductsPage({
           <span className="text-xs font-bold text-[#c9c8ab] uppercase tracking-wider">
             Total SKUs
           </span>
-          <p className="text-4xl font-extrabold text-white">{stats.skus}</p>
+          <p className="text-4xl font-extrabold text-white">{124}</p>
         </div>
 
         {/* Card 2: Public Listings */}
@@ -98,7 +102,7 @@ export default function ProductsPage({
             Public Listings
           </span>
           <p className="text-4xl font-extrabold text-[#e2ec00]">
-            {stats.publicListings}
+            {40}
           </p>
         </div>
 
@@ -107,7 +111,7 @@ export default function ProductsPage({
           <span className="text-xs font-bold text-[#c9c8ab] uppercase tracking-wider">
             Inventory Value
           </span>
-          <p className="text-4xl font-extrabold text-white">{stats.value}</p>
+          <p className="text-4xl font-extrabold text-white">{453}</p>
         </div>
       </div>
 
@@ -120,15 +124,15 @@ export default function ProductsPage({
           <input
             type="text"
             placeholder="Search product name or description..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            // value={searchQuery}
+            // onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full bg-[#1a1a1a] border border-[#252525] rounded-xl pl-12 pr-4 py-3 text-sm text-white placeholder-[#c9c8ab]/40 focus:outline-none focus:border-[#e2ec00] transition-all"
           />
         </div>
 
         <div className="flex gap-2 w-full lg:w-auto shrink-0 justify-end">
           {/* Filter Dropdown Status */}
-          <div className="flex items-center bg-[#1a1a1a] rounded-xl border border-[#252525] p-1">
+          {/* <div className="flex items-center bg-[#1a1a1a] rounded-xl border border-[#252525] p-1">
             <button
               onClick={() => setFilterStatus("All")}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
@@ -159,7 +163,7 @@ export default function ProductsPage({
             >
               Private
             </button>
-          </div>
+          </div> */}
 
           <Link
             href="/admin/products/new"
@@ -172,7 +176,7 @@ export default function ProductsPage({
       </div>
 
       {/* Catalog items render */}
-      {filteredProducts.length === 0 ? (
+      {products.length === 0 ? (
         <div className="text-center py-16 bg-[#1a1a1a]/40 border border-[#252525] rounded-2xl">
           <SlidersHorizontal className="w-12 h-12 mx-auto mb-4 text-gray-600" />
           <h3 className="text-lg font-bold text-white mb-1">
@@ -184,7 +188,7 @@ export default function ProductsPage({
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredProducts.map((p) => {
+          {products.map((p) => {
             const isPublic = p.status === "Public";
             return (
               <div
@@ -196,7 +200,7 @@ export default function ProductsPage({
                 <div className="h-48 w-full overflow-hidden relative bg-[#2a2a2a]">
                   <img
                     alt={p.name}
-                    src={p.image}
+                    src={p.image_url}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     referrerPolicy="no-referrer"
                   />

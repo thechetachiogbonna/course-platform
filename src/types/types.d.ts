@@ -13,19 +13,18 @@ type User = {
 interface Product {
   id: string;
   name: string;
-  sku: string;
+  courses: Course[];
   description: string;
   price: number;
-  image: string;
-  status: "Public" | "Private";
+  imageUrl: string;
+  status: "public" | "private";
 }
 
 interface Course {
   id: string;
   name: string;
   description: string;
-  lastModified: string;
-  productId: string;
+  updated_at: string;
 }
 
 interface Section {
@@ -41,25 +40,7 @@ interface Lesson {
   sectionId: string;
   name: string;
   description: string;
-  videoId: string;
+  youtubeVideoId: string;
   status: "public" | "private" | "preview";
   order: number;
-}
-
-type ActiveView =
-  | "dashboard"
-  | "inventory"
-  | "courses"
-  | "journey"
-  | "competitions"
-  | "settings"
-  | "catalog-entry"
-  | "add-section"
-  | "new-lesson";
-
-interface AlertItem {
-  id: string;
-  message: string;
-  type: "warning" | "info";
-  date: string;
 }

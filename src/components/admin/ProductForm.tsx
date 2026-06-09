@@ -1,332 +1,370 @@
-"use client";
+"use client"
 
-import React, { useState } from "react";
+import { useMemo } from "react"
 import {
   ChevronRight,
   FileText,
-  Image as ImageIcon,
-  CloudUpload,
   Link,
   DollarSign,
   Eye,
-} from "lucide-react";
+} from "lucide-react"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form"
+import CourseMultiSelect from "@/components/admin/CourseMultiSelect"
+import { INITIAL_COURSES } from "@/app/constants"
+import {
+  fieldInputAltClassName,
+  fieldLabelAltClassName,
+  selectTriggerDarkClassName,
+} from "@/lib/form-styles"
+import { cn } from "@/lib/utils"
+import { createProduct } from "@/features/products/action"
+import { toast } from "sonner"
+
+const productFormSchema = z.object({
+  name: z.string().min(1, "Please specify a valid product name."),
+  courseIds: z.array(z.string()),
+  description: z.string(),
+  imageUrl: z.string(),
+  price: z.number().min(0, "Price must be zero or greater."),
+  status: z.enum(["public", "private"]),
+})
+
+type ProductFormValues = z.infer<typeof productFormSchema>
 
 interface ProductFormProps {
-  initialProduct?: Product | null;
+  selectedCourses?: Course[]
+  initialProduct?: Product | null
+  courses: Course[]
 }
 
-export default function ProductForm({ initialProduct }: ProductFormProps) {
-  const [name, setName] = useState(initialProduct ? initialProduct.name : "");
-  const [description, setDescription] = useState(
-    initialProduct ? initialProduct.description : "",
-  );
-  const [image, setImage] = useState(
-    initialProduct ? initialProduct.image : "",
-  );
-  const [price, setPrice] = useState<number>(
-    initialProduct ? initialProduct.price : 0,
-  );
-  const [status, setStatus] = useState<"Public" | "Private">(
-    initialProduct ? initialProduct.status : "Public",
-  );
-  const [dragActive, setDragActive] = useState(false);
+export default function ProductForm({
+  selectedCourses,
+  initialProduct,
+  courses
+}: ProductFormProps) {
+  const form = useForm<ProductFormValues>({
+    resolver: zodResolver(productFormSchema),
+    defaultValues: {
+      name: initialProduct?.name ?? "",
+      courseIds: selectedCourses?.map((course) => course.id) ?? [],
+      description: initialProduct?.description ?? "",
+      imageUrl: initialProduct?.imageUrl ?? "",
+      price: initialProduct?.price ?? 0,
+      status: initialProduct?.status ?? "public",
+    },
+  })
 
-  const handleDrag = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
+  const {
+    name: watchedName,
+    courseIds: watchedCourseIds,
+    description: watchedDescription,
+    imageUrl,
+    price: watchedPrice,
+    status: watchedStatus,
+  } = form.watch()
+
+  const haveNotBeenEditted = useMemo(() => {
+    if (!initialProduct) return false
+
+    const initialCourseIds = [...(initialProduct.courses?.map((c) => c.id) || [])].sort()
+    const currentCourseIds = [...(watchedCourseIds || [])].sort()
+
+    return (
+      initialProduct.name === (watchedName || "").trim() &&
+      JSON.stringify(initialCourseIds) === JSON.stringify(currentCourseIds) &&
+      initialProduct.description === (watchedDescription || "").trim() &&
+      initialProduct.imageUrl === (imageUrl || "").trim() &&
+      initialProduct.price === watchedPrice &&
+      initialProduct.status === watchedStatus
+    )
+  }, [
+    initialProduct,
+    watchedName,
+    watchedCourseIds,
+    watchedDescription,
+    imageUrl,
+    watchedPrice,
+    watchedStatus,
+  ])
+
+  console.log(haveNotBeenEditted)
+
+  const handleSubmit = async (values: ProductFormValues) => {
+    const result = await createProduct(values);
+
+    if (result.error) {
+      toast.error(result.message);
+    } else {
+      form.reset();
+      toast.success(result.message);
     }
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-
-    // Auto populate placeholder image for local upload stimulation
-    const mathSeed = Math.floor(Math.random() * 800);
-    const mockPicUrl = `https://picsum.photos/seed/${mathSeed}/800/400`;
-    setImage(mockPicUrl);
-    alert(
-      `File processed successfully. Cover graphic routed to cached buffer: ${mockPicUrl}`,
-    );
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name.trim()) {
-      alert("Please specify a valid product name.");
-      return;
-    }
-
-    // Handle generic image fallbacks
-    const fallbackImage =
-      image.trim() ||
-      "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80";
-
-    console.log("Product submitted...");
-  };
+  }
 
   return (
-    <div className="flex-1 max-w-3xl mx-auto w-full space-y-8 pb-32">
-      {/* Title block */}
+    <div className="mx-auto w-full max-w-3xl flex-1 space-y-8 pb-32">
       <section className="space-y-3">
         <div className="flex items-center gap-1.5 text-xs font-semibold text-[#c9c8ab]">
           <span>Products</span>
-          <ChevronRight className="w-3.5 h-3.5 text-white/40" />
-          <span className="text-[#e2ec00] font-mono font-medium">
+          <ChevronRight className="h-3.5 w-3.5 text-white/40" />
+          <span className="font-mono font-medium text-[#e2ec00]">
             New Product
           </span>
         </div>
-        <h2 className="text-3xl font-extrabold tracking-tight text-white font-sans">
+        <h2 className="font-sans text-3xl font-extrabold tracking-tight text-white">
           {initialProduct ? "Edit Product" : "Add New Product"}
         </h2>
         <p className="text-sm text-[#c9c8ab]">
-          Configure details, pricing, and availability settings for your
-          product.
+          Configure details, pricing, and availability settings for your product.
         </p>
       </section>
 
-      {/* Main compilation form block */}
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Section 1: Product details */}
-        <div className="bg-[#1a1a1a]/80 backdrop-blur-md border border-[#252525] p-6 rounded-2xl space-y-5">
-          <div className="flex items-center gap-2 pb-3 border-b border-[#252525]/50">
-            <FileText className="w-5 h-5 text-[#e2ec00]" />
-            <h3 className="text-base font-bold text-white tracking-tight">
-              Product Details
-            </h3>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label
-                htmlFor="p_name"
-                className="text-xs font-bold text-[#c9c8ab] uppercase tracking-wider block"
-              >
-                Product Name
-              </label>
-              <input
-                id="p_name"
-                type="text"
-                required
-                placeholder="e.g. Neural Beat Matching Masterclass"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full bg-[#131313] border border-[#252525] rounded-xl px-4 py-3 text-sm text-white placeholder-[#c9c8ab]/30 focus:outline-none focus:border-[#e2ec00] transition-all"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label
-                htmlFor="p_sku"
-                className="text-xs font-bold text-[#c9c8ab] uppercase tracking-wider block"
-              >
-                Attach Course(s)
-              </label>
-              <input
-                id="p_courses"
-                type="text"
-                required
-                placeholder="Check available courses for your product."
-                // value={sku}
-                // onChange={(e) => setSku(e.target.value)}
-                className="w-full bg-[#131313] border border-[#252525] rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#e2ec00] transition-all font-mono"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label
-              htmlFor="p_desc"
-              className="text-xs font-bold text-[#c9c8ab] uppercase tracking-wider block"
-            >
-              Description
-            </label>
-            <textarea
-              id="p_desc"
-              rows={4}
-              placeholder="Describe the learning objectives and AI features..."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="w-full bg-[#131313] border border-[#252525] rounded-xl px-4 py-3 text-sm text-white placeholder-[#c9c8ab]/30 focus:outline-none focus:border-[#e2ec00] transition-all resize-none"
-            />
-          </div>
-        </div>
-
-        {/* Section 2: Visual elements (Drag-drop area metadata) */}
-        {image && (
-          <div className="relative rounded-2xl overflow-hidden">
-            <img
-              src={image}
-              alt="Product Cover"
-              className="w-full h-48 object-cover border border-[#252525] rounded-2xl"
-              referrerPolicy="no-referrer"
-            />
-            <span className="absolute top-2 right-2 bg-[#1a1a1a]/80 text-white text-xs px-2 py-1 rounded">
-              Current Cover
-            </span>
-          </div>
-        )}
-        <div className="bg-[#1a1a1a]/80 backdrop-blur-md border border-[#252525] p-6 rounded-2xl space-y-5">
-          <div className="flex items-center gap-2 pb-3 border-b border-[#252525]/50">
-            <ImageIcon className="w-5 h-5 text-[#e2ec00]" />
-            <h3 className="text-base font-bold text-white tracking-tight">
-              Product Cover
-            </h3>
-          </div>
-
-          {/* Drap Drop Screen Container */}
-          <div
-            onDragEnter={handleDrag}
-            onDragOver={handleDrag}
-            onDragLeave={handleDrag}
-            onDrop={handleDrop}
-            onClick={() => document.getElementById("p_image")?.click()}
-            className={`cursor-pointer border-2 border-dashed rounded-xl aspect-video bg-[#131313] flex flex-col items-center justify-center transition-all p-6 text-center ${
-              dragActive
-                ? "border-[#e2ec00] bg-[#e2ec00]/5 scale-[0.99] shadow-inner"
-                : "border-[#252525] hover:border-[#e2ec00]/40"
-            }`}
-          >
-            <input
-              id="p_image"
-              type="file"
-              accept="image/*"
-              onChange={(e) =>
-                setImage(URL.createObjectURL(e.target.files?.[0]!))
-              }
-              className="w-full h-full hidden"
-            />
-            <CloudUpload className="w-10 h-10 text-[#c9c8ab] mb-2" />
-            <p className="text-xs font-semibold text-white">
-              Tap to upload or drop image here
-            </p>
-            <p className="text-[10px] text-gray-500 mt-1 uppercase tracking-wider">
-              SVG, PNG, JPG or GIF (max. 800x400px)
-            </p>
-          </div>
-
-          {/* Custom URL Input block */}
-          <div className="space-y-2">
-            <label
-              htmlFor="p_img"
-              className="text-xs font-bold text-[#c9c8ab] uppercase tracking-wider block"
-            >
-              Or Custom Image URL
-            </label>
-            <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30">
-                <Link className="w-4 h-4" />
-              </span>
-              <input
-                id="p_img"
-                type="url"
-                placeholder="https://cloud.nudge.ai/v1/assets/..."
-                value={image}
-                onChange={(e) => setImage(e.target.value)}
-                className="w-full bg-[#131313] border border-[#252525] rounded-xl pl-12 pr-4 py-3 text-sm text-white placeholder-[#c9c8ab]/30 focus:outline-none focus:border-[#e2ec00] transition-all font-mono text-xs"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Section 3: Pricing & Config availability */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Box 1: Price block */}
-          <div className="bg-[#1a1a1a]/80 backdrop-blur-md border border-[#252525] p-6 rounded-2xl space-y-4">
-            <div className="flex items-center gap-2 pb-2 border-b border-[#252525]/50">
-              <span className="p-1 rounded bg-[#e2ec00]/10 text-[#e2ec00] shrink-0">
-                <DollarSign className="w-4 h-4" />
-              </span>
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider">
-                Pricing Configuration
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(handleSubmit)}
+          className="space-y-6"
+        >
+          <div className="space-y-5 rounded-2xl border border-[#252525] bg-[#1a1a1a]/80 p-6 backdrop-blur-md">
+            <div className="flex items-center gap-2 border-b border-[#252525]/50 pb-3">
+              <FileText className="h-5 w-5 text-[#e2ec00]" />
+              <h3 className="text-base font-bold tracking-tight text-white">
+                Product Details
               </h3>
             </div>
 
-            <div className="space-y-2">
-              <label
-                htmlFor="p_price"
-                className="text-xs font-extrabold text-[#c9c8ab] uppercase tracking-widest block"
-              >
-                Unit Price (USD)
-              </label>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#e2ec00] font-bold font-mono">
-                  $
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className={fieldLabelAltClassName}>
+                      Product Name
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="e.g. Neural Beat Matching Masterclass"
+                        className={fieldInputAltClassName}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="courseIds"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className={fieldLabelAltClassName}>
+                      Attach Course(s)
+                    </FormLabel>
+                    <FormControl>
+                      <CourseMultiSelect
+                        courses={courses}
+                        value={field.value}
+                        onChange={field.onChange}
+                        placeholder="Check available courses for your product."
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className={fieldLabelAltClassName}>
+                    Description
+                  </FormLabel>
+                  <FormControl>
+                    <Textarea
+                      rows={4}
+                      placeholder="Describe the learning objectives and AI features..."
+                      className={cn(
+                        fieldInputAltClassName,
+                        "min-h-0 resize-none",
+                      )}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          {imageUrl && (
+            <div className="relative overflow-hidden rounded-2xl">
+              <img
+                src={imageUrl}
+                alt="Product Cover"
+                className="h-48 w-full rounded-2xl border border-[#252525] object-cover"
+                referrerPolicy="no-referrer"
+              />
+            </div>
+          )}
+
+          <div className="space-y-5 rounded-2xl border border-[#252525] bg-[#1a1a1a]/80 p-6 backdrop-blur-md">
+            <FormField
+              control={form.control}
+              name="imageUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className={fieldLabelAltClassName}>
+                    Image URL
+                  </FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <span className="absolute top-1/2 left-4 -translate-y-1/2 text-white/30">
+                        <Link className="h-4 w-4" />
+                      </span>
+                      <Input
+                        type="url"
+                        placeholder="https://cloud.nudge.ai/v1/assets/..."
+                        className={cn(
+                          fieldInputAltClassName,
+                          "pl-12 font-mono text-xs",
+                        )}
+                        {...field}
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div className="space-y-4 rounded-2xl border border-[#252525] bg-[#1a1a1a]/80 p-6 backdrop-blur-md">
+              <div className="flex items-center gap-2 border-b border-[#252525]/50 pb-2">
+                <span className="shrink-0 rounded bg-[#e2ec00]/10 p-1 text-[#e2ec00]">
+                  <DollarSign className="h-4 w-4" />
                 </span>
-                <input
-                  id="p_price"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  placeholder="0.00"
-                  value={price || ""}
-                  onChange={(e) => setPrice(parseFloat(e.target.value) || 0)}
-                  className="w-full bg-[#131313] border border-[#252525] rounded-xl pl-8 pr-4 py-3 text-sm text-white focus:outline-none focus:border-[#e2ec00] transition-all font-mono"
-                />
+                <h3 className="text-sm font-bold tracking-wider text-white uppercase">
+                  Pricing Configuration
+                </h3>
               </div>
+
+              <FormField
+                control={form.control}
+                name="price"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-extrabold tracking-widest text-[#c9c8ab] uppercase">
+                      Unit Price (USD)
+                    </FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <span className="absolute top-1/2 left-4 -translate-y-1/2 font-mono font-bold text-[#e2ec00]">
+                          $
+                        </span>
+                        <Input
+                          type="number"
+                          min={0}
+                          step="0.01"
+                          placeholder="0.00"
+                          className={cn(
+                            fieldInputAltClassName,
+                            "pl-8 font-mono",
+                          )}
+                          value={field.value || ""}
+                          onChange={(e) =>
+                            field.onChange(parseFloat(e.target.value) || 0)
+                          }
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="space-y-4 rounded-2xl border border-[#252525] bg-[#1a1a1a]/80 p-6 backdrop-blur-md">
+              <div className="flex items-center gap-2 border-b border-[#252525]/50 pb-2">
+                <span className="shrink-0 rounded bg-[#e2ec00]/10 p-1 text-[#e2ec00]">
+                  <Eye className="h-4 w-4" />
+                </span>
+                <h3 className="text-sm font-bold tracking-wider text-white uppercase">
+                  Availability Status
+                </h3>
+              </div>
+
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-extrabold tracking-widest text-[#c9c8ab] uppercase">
+                      Visibility Status
+                    </FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger className={selectTriggerDarkClassName}>
+                          <SelectValue placeholder="Select visibility" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className="border-[#252525] bg-[#131313] text-white">
+                        <SelectItem value="public">
+                          Public - Marketplace Listing
+                        </SelectItem>
+                        <SelectItem value="private">
+                          Private - Sandbox/Cohort Only
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
           </div>
 
-          {/* Box 2: Availability select */}
-          <div className="bg-[#1a1a1a]/80 backdrop-blur-md border border-[#252525] p-6 rounded-2xl space-y-4">
-            <div className="flex items-center gap-2 pb-2 border-b border-[#252525]/50">
-              <span className="p-1 rounded bg-[#e2ec00]/10 text-[#e2ec00] shrink-0">
-                <Eye className="w-4 h-4" />
-              </span>
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider">
-                Availability Status
-              </h3>
-            </div>
-
-            <div className="space-y-2">
-              <label
-                htmlFor="p_status"
-                className="text-xs font-extrabold text-[#c9c8ab] uppercase tracking-widest block"
-              >
-                Visibility Status
-              </label>
-              <select
-                id="p_status"
-                value={status}
-                onChange={(e) =>
-                  setStatus(e.target.value as "Public" | "Private")
-                }
-                className="w-full bg-[#131313] border border-[#252525] rounded-xl px-4 py-3 text-sm text-white appearance-none focus:outline-none focus:border-[#e2ec00] transition-all cursor-pointer"
-              >
-                <option value="Public">Public - Marketplace Listing</option>
-                <option value="Private">Private - Sandbox/Cohort Only</option>
-              </select>
-            </div>
+          <div className="flex flex-col items-center gap-3 border-t border-[#252525]/40 pt-6 sm:flex-row">
+            <Button
+              type="submit"
+              disabled={form.formState.isSubmitting || haveNotBeenEditted}
+              className="h-auto w-full rounded-xl bg-[#e2ec00] px-8 py-4 text-xs font-bold tracking-wider text-[#1c1d00] uppercase shadow-[0_4px_16px_rgba(226,236,0,0.25)] hover:brightness-110 active:scale-95 sm:w-auto"
+            >
+              {form.formState.isSubmitting
+                ? "Saving..."
+                : initialProduct
+                  ? "Apply Configuration"
+                  : "Create Product"}
+            </Button>
           </div>
-        </div>
-
-        {/* Form Actions bar */}
-        <div className="flex flex-col sm:flex-row items-center gap-3 pt-6 border-t border-[#252525]/40">
-          <button
-            type="submit"
-            className="w-full sm:w-auto px-8 py-4 bg-[#e2ec00] text-[#1c1d00] hover:brightness-110 active:scale-95 text-xs font-bold rounded-xl shadow-[0_4px_16px_rgba(226,236,0,0.25)] transition-all uppercase tracking-wider"
-          >
-            {initialProduct ? "Apply Configuration" : "Create Product SKU"}
-          </button>
-
-          <button
-            type="button"
-            onClick={() =>
-              console.log(
-                "Cancel action triggered. Returning to product list...",
-              )
-            }
-            className="w-full sm:w-auto px-8 py-4 bg-transparent border border-[#353534] text-[#c9c8ab] hover:text-white hover:bg-white/5 rounded-xl text-xs font-bold transition-all uppercase"
-          >
-            Cancel
-          </button>
-        </div>
-      </form>
+        </form>
+      </Form>
     </div>
-  );
+  )
 }

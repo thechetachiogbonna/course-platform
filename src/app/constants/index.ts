@@ -51,28 +51,24 @@ export const INITIAL_COURSES: Course[] = [
     name: "Advanced Neural Networks",
     description: "Mastering architectures and GANs",
     lastModified: "2 hours ago",
-    productId: "PROD-NN-992",
   },
   {
     id: "course-2",
     name: "LLM Fine-Tuning 101",
     description: "Customizing models for enterprise",
     lastModified: "Oct 12, 2023",
-    productId: "PROD-LL-441",
   },
   {
     id: "course-3",
     name: "Generative Art Pipeline",
     description: "Automating creative workflows",
     lastModified: "Yesterday",
-    productId: "PROD-GA-882",
   },
   {
     id: "course-4",
     name: "Scalable AI Infrastructure",
     description: "Cloud deployments & monitoring",
     lastModified: "5 days ago",
-    productId: "PROD-IF-210",
   },
 ];
 

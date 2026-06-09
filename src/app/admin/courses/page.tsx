@@ -1,8 +1,4 @@
-"use client";
-
-import { useState, useMemo } from "react";
 import {
-  Plus,
   Search,
   ChevronLeft,
   ChevronRight,
@@ -13,41 +9,38 @@ import {
 import {
   INITIAL_COURSES,
   INITIAL_LESSONS,
+  INITIAL_PRODUCTS,
   INITIAL_SECTIONS,
 } from "@/app/constants";
-import { useRouter } from "next/navigation";
+import CourseForm from "@/components/admin/CourseForm";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { db } from "@/database/db";
 
-interface CourseManagementViewProps {
-  courses: Course[];
-  sections: Section[];
-  lessons: Lesson[];
-  onNewCourseClick: () => void;
-  onAddSectionClick: (courseId: string) => void;
-  onAddLessonClick: (sectionId: string) => void;
-  onDeleteCourseClick: (id: string) => void;
+const getCourses = async () => {
+  const courses = await db.query(
+    `
+      SELECT
+        c.*,
+        COUNT(DISTINCT s.id) AS section_count,
+        COUNT(DISTINCT l.id) AS lesson_count,
+        c.updated_at AS last_modified
+      FROM courses c
+      LEFT JOIN sections s
+      ON c.id = s.course_id
+      LEFT JOIN lessons l
+      ON s.id = l.section_id
+      GROUP BY c.id
+      ORDER BY c.created_at DESC;
+    `)
+    const result = courses.rows
+
+ return result;
 }
 
-export default function CoursesPage({
-  courses = INITIAL_COURSES,
-  sections = INITIAL_SECTIONS,
-  lessons = INITIAL_LESSONS,
-  onNewCourseClick,
-  onAddSectionClick,
-  onAddLessonClick,
-  onDeleteCourseClick,
-}: CourseManagementViewProps) {
-  const [searchQuery, setSearchQuery] = useState("");
-  const router = useRouter();
-
-  // Filter courses based on search query
-  const filteredCourses = useMemo(() => {
-    return courses.filter((c) => {
-      return (
-        c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        c.description.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    });
-  }, [courses, searchQuery]);
+export default async function CoursesPage() {
+  const courses = await getCourses();
+  console.log(courses)
 
   return (
     <div className="flex-1 w-full space-y-8 pb-16">
@@ -72,19 +65,13 @@ export default function CoursesPage({
           <input
             type="text"
             placeholder="Search courses..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            // value={searchQuery}
+            // onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full bg-[#1a1a1a] border border-[#252525] rounded-xl pl-12 pr-4 py-3 text-sm text-white placeholder-[#c9c8ab]/40 focus:outline-none focus:border-[#e2ec00] transition-all"
           />
         </div>
 
-        <button
-          onClick={onNewCourseClick}
-          className="w-full md:w-auto bg-[#e2ec00] text-[#1c1d00] hover:brightness-110 active:scale-95 transition-all px-5 py-3 rounded-xl font-bold text-xs tracking-wider flex items-center gap-1.5 shadow-[0_4px_12px_rgba(226,236,0,0.15)] uppercase select-none"
-        >
-          <Plus className="w-4 h-4" />
-          New Course
-        </button>
+        <CourseForm products={INITIAL_PRODUCTS} />
       </div>
 
       {/* Main Table Panel */}
@@ -111,7 +98,7 @@ export default function CoursesPage({
               </tr>
             </thead>
             <tbody className="divide-y divide-[#252525]/40">
-              {filteredCourses.map((course) => {
+              {courses.map((course) => {
                 return (
                   <tr
                     key={course.id}
@@ -137,39 +124,34 @@ export default function CoursesPage({
 
                     {/* Session Count */}
                     <td className="px-6 py-4 text-sm text-[#c9c8ab]">
-                      {sections.filter((s) => s.courseId === course.id).length}
+                      {course.section_count}
                     </td>
 
                     {/* Lesson Count */}
                     <td className="px-6 py-4 text-sm text-[#c9c8ab]">
-                      {
-                        lessons.filter((l) => {
-                          const section = sections.find(
-                            (s) => s.id === l.sectionId,
-                          );
-                          return section?.courseId === course.id;
-                        }).length
-                      }
+                      {course.lesson_count}
                     </td>
 
                     {/* Last Modified */}
                     <td className="px-6 py-4 text-xs text-[#c9c8ab]">
-                      {course.lastModified}
+                      {String(course.last_modified)}
                     </td>
 
                     {/* Actions Trigger */}
                     <td
                       className="px-6 py-4 text-right"
-                      onClick={(e) => e.stopPropagation()}
                     >
                       <div className="justify-self-end flex justify-between gap-10 text-left">
-                        <button
-                          onClick={() =>
-                            router.push(`/admin/courses/${course.id}/edit`)
-                          }
+                        <Button
+                          asChild  
                         >
-                          <Edit className="w-5 h-5 text-[#c9c8ab] hover:text-white cursor-pointer" />
-                        </button>
+                          <Link
+                            href={`/admin/courses/${course.id}/edit`}
+                            className="w-5 h-5 text-[#c9c8ab] hover:text-white cursor-pointer"
+                          >
+                            <Edit className="w-5 h-5 text-[#c9c8ab] hover:text-white cursor-pointer" />
+                          </Link>
+                        </Button>
                         <button>
                           <Trash2 className="w-5 h-5 text-[#c9c8ab] hover:text-white cursor-pointer" />
                         </button>
@@ -185,7 +167,7 @@ export default function CoursesPage({
         {/* Course Footer Grid summary */}
         <div className="px-6 py-4 bg-[#201f1f]/30 border-t border-[#252525] flex justify-between items-center flex-col sm:flex-row gap-4">
           <p className="text-xs text-[#c9c8ab]">
-            Showing 1-{filteredCourses.length} of {courses.length} courses
+            {/* Showing 1-{filteredCourses.length} of {courses.length} courses */}
             listed
           </p>
           <div className="flex gap-2">

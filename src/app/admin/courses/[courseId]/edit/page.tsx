@@ -1,20 +1,91 @@
-"use client";
-
-import {
-  INITIAL_COURSES,
-  INITIAL_LESSONS,
-  INITIAL_SECTIONS,
-} from "@/app/constants";
 import LessonForm from "@/components/admin/LessonForm";
 import SectionForm from "@/components/admin/SectionForm";
+import { db } from "@/database/db";
 import { FolderOpen, PlaySquare, Plus } from "lucide-react";
-import { useState } from "react";
 
-const selectedCourse = INITIAL_COURSES[0];
-const selectedCourseSections = INITIAL_SECTIONS;
+interface CourseDetails extends Course {
+  sections: (Section & { lessons: Lesson[] })[];
+}
 
-function EditCoursePage() {
-  const [addSectionOpen, setAddSectionOpen] = useState(false);
+const getCourseSectionsLessons = async (courseId: string) => {
+  const result = await db.query(
+    `
+      SELECT
+        c.id AS course_id,
+        c.name AS course_name,
+        c.description AS course_description,
+
+        s.id AS section_id,
+        s.name AS section_name,
+        s.status AS section_status,
+        s.order AS section_order,
+
+        l.id AS lesson_id,
+        l.name AS lesson_name,
+        l.description AS lesson_description,
+        l.status AS lesson_status,
+        l.order AS lesson_order,
+        l.youtube_video_id
+      FROM courses c
+      LEFT JOIN sections s
+        ON c.id = s.course_id
+      LEFT JOIN lessons l
+        ON s.id = l.section_id
+      WHERE c.id = $1
+      ORDER BY s.created_at, l.created_at
+    `,
+    [courseId],
+  );
+
+  const firstRow = result.rows[0];
+
+  const course = {
+    id: firstRow.course_id,
+    name: firstRow.course_name,
+    description: firstRow.course_description,
+    updated_at: firstRow.updated_at,
+    sections: [],
+  } as CourseDetails
+
+  const sectionMap = new Map();
+
+  for (const row of result.rows) {
+    if (row.section_id && !sectionMap.has(row.section_id)) {
+      const section = {
+        id: row.section_id,
+        name: row.section_name,
+        status: row.section_status,
+        order: row.section_order,
+        courseId: row.courseId,
+        lessons: [],
+      };
+
+      sectionMap.set(row.section_id, section);
+      course.sections.push(section);
+    }
+
+    if (row.lesson_id) {
+      sectionMap.get(row.section_id)?.lessons.push({
+        id: row.lesson_id,
+        name: row.lesson_name,
+        description: row.lesson_description,
+        youtubeVideoId: row.lesson_youtube_video_id,
+        status: row.lesson_status,
+        order: row.lesson_order,
+      });
+    }
+  }
+
+  return course;
+};
+
+async function EditCoursePage({
+  params,
+}: {
+  params: Promise<{ courseId: string }>;
+}) {
+  const courseId = (await params).courseId;
+  const course = await getCourseSectionsLessons(courseId);
 
   return (
     <>
@@ -27,34 +98,22 @@ function EditCoursePage() {
                 CURRICULUM TREE
               </span>
               <h3 className="text-base font-bold text-white tracking-tight">
-                {selectedCourse.name}
+                {course.name}
               </h3>
             </div>
           </div>
 
-          <button className="bg-[#e2ec00]/10 border border-[#e2ec00]/30 text-[#e2ec00] text-xs font-bold py-2 px-4 rounded-xl hover:bg-[#e2ec00]/20 transition-all flex items-center gap-1 uppercase tracking-wider">
-            <Plus className="w-3.5 h-3.5" />
-            <SectionForm
-              course={selectedCourse}
-              onSubmit={() => {}}
-              onCancel={() => {}}
-            />
-          </button>
+          <SectionForm courseName={course.name} courseId={courseId} />
         </div>
 
-        {selectedCourseSections.length === 0 ? (
+        {course.sections.length === 0 ? (
           <div className="text-center py-8 text-gray-500 text-xs font-mono">
             Syllabus structure empty. Click "Add Section" to compile curriculum
             blocks.
           </div>
         ) : (
           <div className="space-y-4">
-            {selectedCourseSections.map((section, idx) => {
-              // Find lessons for each section
-              const sectionLessons = INITIAL_LESSONS.filter(
-                (l) => l.sectionId === section.id,
-              ).sort((a, b) => a.order - b.order);
-
+            {course.sections.map((section, idx) => {
               return (
                 <div
                   key={section.id}
@@ -76,31 +135,33 @@ function EditCoursePage() {
                         {section.status}
                       </span>
 
-                      <button className="text-[#e2ec00] hover:text-white border border-[#e2ec00]/20 hover:border-[#e2ec00] text-[10px] font-bold py-1 px-3 rounded-lg flex items-center gap-1 uppercase transition-all">
-                        <Plus className="w-3 h-3" />
-                        <LessonForm
-                          sectionName={selectedCourseSections[0].name}
-                          onSubmit={() => {}}
-                          onCancel={() => {}}
-                        />
-                      </button>
+                      <LessonForm
+                        sectionName={section.name}
+                        sectionId={section.id}
+                      >
+                        <div 
+                          className="cursor-pointer text-[#e2ec00] hover:text-white border border-[#e2ec00]/20 hover:border-[#e2ec00] text-[10px] font-bold py-1 px-3 rounded-lg flex items-center gap-1 transition-all"
+                        >
+                          <Plus className="w-3 h-3" />
+                          <span>Add Lesson</span>
+                        </div>
+                      </LessonForm>
                     </div>
                   </div>
 
                   {/* Section Lessons */}
                   <div className="divide-y divide-[#252525]/20">
-                    {sectionLessons.length === 0 ? (
+                    {section.lessons.length === 0 ? (
                       <div className="p-4 text-center text-xs text-gray-500 italic">
                         No lessons recorded in this section module. Press "Add
                         Lesson" to populate clips.
                       </div>
                     ) : (
-                      sectionLessons.map((lesson) => (
+                      section.lessons.map((lesson) => (
                         <LessonForm
                           key={lesson.id}
-                          sectionName={selectedCourseSections[1].name}
-                          onSubmit={() => {}}
-                          onCancel={() => {}}
+                          sectionName={section.name}
+                          sectionId={section.id}
                         >
                           <div className="w-full p-4 flex items-start gap-3 hover:bg-white/5 transition-colors cursor-pointer">
                             <div className="p-2 rounded-lg bg-[#e2ec00]/10 text-[#e2ec00] shrink-0 mt-0.5">
@@ -116,7 +177,7 @@ function EditCoursePage() {
                                   <p className="text-[11px] text-[#c9c8ab] mt-1 lead-relaxed line-clamp-2">
                                     {lesson.description}
                                   </p>
-                                  {lesson.videoId && (
+                                  {lesson.youtubeVideoId && (
                                     <span className="text-[9px] text-[#e2ec00]/60 font-mono mt-1 block">
                                       Tip: Click a lesson to edit
                                     </span>
