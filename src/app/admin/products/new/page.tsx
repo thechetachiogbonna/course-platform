@@ -14,5 +14,5 @@ const getAvailableCourse = async () => {
 
 export default async function NewProductPage() {
   const courses = await getAvailableCourse();
-  return <ProductForm courses={courses} />;
+  return <ProductForm type="create" courses={courses} />;
 }

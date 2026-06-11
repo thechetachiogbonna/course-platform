@@ -37,7 +37,7 @@ import {
   selectTriggerDarkClassName,
 } from "@/lib/form-styles"
 import { cn } from "@/lib/utils"
-import { createProduct } from "@/features/products/action"
+import { createProduct, updateProduct } from "@/features/products/action"
 import { toast } from "sonner"
 
 const productFormSchema = z.object({
@@ -52,12 +52,14 @@ const productFormSchema = z.object({
 type ProductFormValues = z.infer<typeof productFormSchema>
 
 interface ProductFormProps {
+  type: "create" | "edit";
   selectedCourses?: Course[]
   initialProduct?: Product | null
   courses: Course[]
 }
 
 export default function ProductForm({
+  type,
   selectedCourses,
   initialProduct,
   courses
@@ -107,17 +109,30 @@ export default function ProductForm({
     watchedStatus,
   ])
 
-  console.log(haveNotBeenEditted)
-
   const handleSubmit = async (values: ProductFormValues) => {
-    const result = await createProduct(values);
+    if (type === "create") {
+      const result = await createProduct(values);
 
-    if (result.error) {
-      toast.error(result.message);
-    } else {
-      form.reset();
-      toast.success(result.message);
+      if (result.error) {
+        toast.error(result.message);
+      } else {
+        form.reset();
+        toast.success(result.message);
+      }
     }
+
+    if (type === "edit") {
+      if (!initialProduct) return
+
+      const result = await updateProduct(initialProduct.id, values);
+
+      if (result.error) {
+        toast.error(result.message);
+      } else {
+        toast.success(result.message);
+      }
+    }
+
   }
 
   return (
@@ -127,11 +142,11 @@ export default function ProductForm({
           <span>Products</span>
           <ChevronRight className="h-3.5 w-3.5 text-white/40" />
           <span className="font-mono font-medium text-[#e2ec00]">
-            New Product
+            {type === "create" ? "New Product" : "Edit Product"}
           </span>
         </div>
         <h2 className="font-sans text-3xl font-extrabold tracking-tight text-white">
-          {initialProduct ? "Edit Product" : "Add New Product"}
+          {type === "create" ? "Add New Product" : "Edit Product"}
         </h2>
         <p className="text-sm text-[#c9c8ab]">
           Configure details, pricing, and availability settings for your product.

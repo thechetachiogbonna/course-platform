@@ -46,7 +46,7 @@ async function EditProductPage({
     getAvailableCourse(),
   ]);
 
-  return <ProductForm selectedCourses={product.courses} initialProduct={product} courses={availableCourses} />;
+  return <ProductForm type="edit" selectedCourses={product.courses} initialProduct={product} courses={availableCourses} />;
 }
 
 export default EditProductPage;

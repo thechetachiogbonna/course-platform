@@ -57,3 +57,67 @@ export const createProduct = async (productData: Pick<Product, "name" | "descrip
         };
     } 
 }
+
+export const updateProduct = async (id: string, productData: Pick<Product, "name" | "description" | "imageUrl" | "price" | "status"> & { courseIds: string[] }) => {
+    try {
+        await db.query("BEGIN");
+
+        await db.query(
+            `
+            UPDATE products
+            SET
+                name = $1,
+                description = $2,
+                image_url = $3,
+                price = $4,
+                status = $5,
+                updated_at = NOW()
+            WHERE id = $6
+            RETURNING id
+            `,
+            [
+                productData.name,
+                productData.description,
+                productData.imageUrl,
+                productData.price,
+                productData.status,
+                id,
+            ],
+        );
+
+        await db.query(
+            `
+            DELETE FROM course_products
+            WHERE product_id = $1
+            `,
+            [id],
+        );
+
+        for (const courseId of productData.courseIds) {
+            await db.query(
+                `
+                    INSERT INTO course_products (
+                        course_id,
+                        product_id
+                    ) VALUES ($1, $2)
+                `,
+                [courseId, id],
+            );
+        }
+
+        await db.query("COMMIT");
+
+        return {
+            error: false,
+            message: "Product updated successfully",
+        };
+    } catch (error) {
+        await db.query("ROLLBACK");
+        console.error("Error updating product:", error);
+        return {
+            error: true,
+            message:
+                error instanceof Error ? error.message : "Failed to update product",
+        };
+    }
+}

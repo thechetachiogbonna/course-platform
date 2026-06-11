@@ -1,6 +1,7 @@
 "use server";
 
 import { db } from "@/database/db";
+import { revalidatePath } from "next/cache";
 
 export const createLesson = async (lessonData: Omit<Lesson, "id">) => {
   try {
@@ -16,6 +17,12 @@ export const createLesson = async (lessonData: Omit<Lesson, "id">) => {
       ],
     );
 
+    const sectionResult = await db.query(`SELECT course_id FROM sections WHERE id = $1`, [lessonData.sectionId]);
+    const courseId = sectionResult.rows[0]?.course_id;
+    if (courseId) {
+      revalidatePath(`/admin/courses/${courseId}/edit`);
+    }
+
     return {
       error: false,
       message: "Lesson created successfully",
@@ -27,6 +34,72 @@ export const createLesson = async (lessonData: Omit<Lesson, "id">) => {
       error: true,
       message:
         error instanceof Error ? error.message : "Failed to create lesson",
+    };
+  }
+};
+
+export const updateLesson = async (lessonId: string, lessonData: Omit<Lesson, "id" | "sectionId">) => {
+  try {
+    const sectionResult = await db.query(
+      `SELECT s.course_id FROM sections s JOIN lessons l ON s.id = l.section_id WHERE l.id = $1`,
+      [lessonId]
+    );
+    const courseId = sectionResult.rows[0]?.course_id;
+
+    await db.query(
+      `UPDATE lessons SET name = $1, description = $2, status = $3, "order" = $4, youtube_video_id = $5 WHERE id = $6`,
+      [
+        lessonData.name,
+        lessonData.description,
+        lessonData.status,
+        lessonData.order,
+        lessonData.youtubeVideoId,
+        lessonId,
+      ],
+    );
+
+    if (courseId) {
+      revalidatePath(`/admin/courses/${courseId}/edit`);
+    }
+
+    return {
+      error: false,
+      message: "Lesson updated successfully",
+    };
+  } catch (error) {
+    console.error("Error updating lesson:", error);
+    return {
+      error: true,
+      message:
+        error instanceof Error ? error.message : "Failed to update lesson",
+    };
+  }
+};
+
+export const deleteLesson = async (lessonId: string) => {
+  try {
+    const sectionResult = await db.query(
+      `SELECT s.course_id FROM sections s JOIN lessons l ON s.id = l.section_id WHERE l.id = $1`,
+      [lessonId]
+    );
+    const courseId = sectionResult.rows[0]?.course_id;
+
+    await db.query(`DELETE FROM lessons WHERE id = $1`, [lessonId]);
+
+    if (courseId) {
+      revalidatePath(`/admin/courses/${courseId}/edit`);
+    }
+
+    return {
+      error: false,
+      message: "Lesson deleted successfully",
+    };
+  } catch (error) {
+    console.error("Error deleting lesson:", error);
+    return {
+      error: true,
+      message:
+        error instanceof Error ? error.message : "Failed to delete lesson",
     };
   }
 };

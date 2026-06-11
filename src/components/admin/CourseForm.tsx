@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { ArrowLeft, Plus } from "lucide-react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
@@ -18,13 +19,11 @@ import { Textarea } from "@/components/ui/textarea"
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import ProductMultiSelect from "@/components/admin/ProductMultiSelect"
 import {
   cancelButtonClassName,
   dialogContentClassName,
@@ -43,13 +42,8 @@ const courseFormSchema = z.object({
 
 type CourseFormValues = z.infer<typeof courseFormSchema>
 
-interface CourseFormProps {
-  products: Product[]
-}
-
-export default function CourseForm({
-  products
-}: CourseFormProps) {
+export default function CourseForm() {
+  const [open, setOpen] = useState(false);
   const form = useForm<CourseFormValues>({
     resolver: zodResolver(courseFormSchema),
     defaultValues: {
@@ -65,18 +59,19 @@ export default function CourseForm({
     } else {
       form.reset()
       toast.success(result.message)
+      setOpen(false)
     }
   }
 
   return (
-    <Dialog>
-      <DialogTrigger
-        className="w-full md:w-auto bg-[#e2ec00] text-[#1c1d00] hover:brightness-110 active:scale-95 transition-all px-5 py-3 rounded-xl font-bold text-xs tracking-wider flex items-center gap-1.5 shadow-[0_4px_12px_rgba(226,236,0,0.15)] uppercase select-none"
-      >
-        <>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <button
+          className="w-full md:w-auto bg-[#e2ec00] text-[#1c1d00] hover:brightness-110 active:scale-95 transition-all px-5 py-3 rounded-xl font-bold text-xs tracking-wider flex items-center gap-1.5 shadow-[0_4px_12px_rgba(226,236,0,0.15)] uppercase select-none cursor-pointer"
+        >
           <Plus className="w-4 h-4" />
           <span>New Course</span>
-        </>
+        </button>
       </DialogTrigger>
       <DialogContent
         className={cn(dialogContentClassName, "max-w-xl")}
@@ -135,29 +130,6 @@ export default function CourseForm({
                   </FormItem>
                 )}
               />
-
-              {/* <FormField
-                control={form.control}
-                name="productIds"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className={fieldLabelClassName}>
-                      Product Link
-                    </FormLabel>
-                    <FormControl>
-                      <ProductMultiSelect
-                        products={products}
-                        value={field.value}
-                        onChange={field.onChange}
-                      />
-                    </FormControl>
-                    <FormDescription className="text-[11px] text-gray-500 italic">
-                      Associate this course with billing entities.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              /> */}
 
               <FormField
                 control={form.control}

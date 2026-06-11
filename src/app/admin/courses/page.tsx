@@ -6,12 +6,6 @@ import {
   Edit,
   Video,
 } from "lucide-react";
-import {
-  INITIAL_COURSES,
-  INITIAL_LESSONS,
-  INITIAL_PRODUCTS,
-  INITIAL_SECTIONS,
-} from "@/app/constants";
 import CourseForm from "@/components/admin/CourseForm";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -40,7 +34,6 @@ const getCourses = async () => {
 
 export default async function CoursesPage() {
   const courses = await getCourses();
-  console.log(courses)
 
   return (
     <div className="flex-1 w-full space-y-8 pb-16">
@@ -71,7 +64,7 @@ export default async function CoursesPage() {
           />
         </div>
 
-        <CourseForm products={INITIAL_PRODUCTS} />
+        <CourseForm />
       </div>
 
       {/* Main Table Panel */}

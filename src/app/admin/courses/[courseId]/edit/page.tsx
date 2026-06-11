@@ -1,7 +1,9 @@
 import LessonForm from "@/components/admin/LessonForm";
 import SectionForm from "@/components/admin/SectionForm";
+import DeleteLessonButton from "@/components/admin/DeleteLessonButton";
+import DeleteSectionButton from "@/components/admin/DeleteSectionButton";
 import { db } from "@/database/db";
-import { FolderOpen, PlaySquare, Plus } from "lucide-react";
+import { FolderOpen, PlaySquare, Plus, Edit } from "lucide-react";
 
 interface CourseDetails extends Course {
   sections: (Section & { lessons: Lesson[] })[];
@@ -25,7 +27,7 @@ const getCourseSectionsLessons = async (courseId: string) => {
         l.description AS lesson_description,
         l.status AS lesson_status,
         l.order AS lesson_order,
-        l.youtube_video_id
+        l.youtube_video_id AS lesson_youtube_video_id
       FROM courses c
       LEFT JOIN sections s
         ON c.id = s.course_id
@@ -103,7 +105,12 @@ async function EditCoursePage({
             </div>
           </div>
 
-          <SectionForm courseName={course.name} courseId={courseId} />
+          <SectionForm type="create" courseName={course.name} courseId={courseId} nextSectionOrder={course.sections.length + 1}>
+            <button className="bg-[#e2ec00]/10 border border-[#e2ec00]/30 text-[#e2ec00] text-xs font-bold py-2 px-4 rounded-xl hover:bg-[#e2ec00]/20 transition-all flex items-center gap-1 uppercase tracking-wider cursor-pointer">
+              <Plus className="w-3.5 h-3.5" />
+              <span>New Section</span>
+            </button>
+          </SectionForm>
         </div>
 
         {course.sections.length === 0 ? (
@@ -123,7 +130,7 @@ async function EditCoursePage({
                   <div className="bg-[#1e1e1e]/60 p-4 flex items-center justify-between border-b border-[#252525]/40 flex-wrap gap-2">
                     <div>
                       <span className="text-[10px] text-[#c9c8ab] font-mono">
-                        SECTION #{idx + 1}
+                        SECTION #{section.order}
                       </span>
                       <h4 className="text-sm font-bold text-white mt-0.5">
                         {section.name}
@@ -135,11 +142,31 @@ async function EditCoursePage({
                         {section.status}
                       </span>
 
+                      {/* Section edit/delete actions */}
+                      <div className="flex items-center gap-1 border-r border-white/10 pr-2">
+                        <SectionForm
+                          type="edit"
+                          courseName={course.name}
+                          courseId={courseId}
+                          section={section}
+                        >
+                          <button
+                            className="p-1.5 rounded-lg hover:bg-white/10 text-[#c9c8ab]/60 hover:text-[#e2ec00] transition-colors cursor-pointer"
+                            title="Edit Section"
+                          >
+                            <Edit className="w-3.5 h-3.5" />
+                          </button>
+                        </SectionForm>
+                        <DeleteSectionButton sectionId={section.id} sectionName={section.name} />
+                      </div>
+
                       <LessonForm
+                        type="create"
                         sectionName={section.name}
                         sectionId={section.id}
+                        nextLessonOrder={section.lessons.length + 1}
                       >
-                        <div 
+                        <div
                           className="cursor-pointer text-[#e2ec00] hover:text-white border border-[#e2ec00]/20 hover:border-[#e2ec00] text-[10px] font-bold py-1 px-3 rounded-lg flex items-center gap-1 transition-all"
                         >
                           <Plus className="w-3 h-3" />
@@ -158,44 +185,53 @@ async function EditCoursePage({
                       </div>
                     ) : (
                       section.lessons.map((lesson) => (
-                        <LessonForm
+                        <div
                           key={lesson.id}
-                          sectionName={section.name}
-                          sectionId={section.id}
+                          className="w-full p-4 flex items-start gap-3 hover:bg-white/5 transition-colors"
                         >
-                          <div className="w-full p-4 flex items-start gap-3 hover:bg-white/5 transition-colors cursor-pointer">
-                            <div className="p-2 rounded-lg bg-[#e2ec00]/10 text-[#e2ec00] shrink-0 mt-0.5">
-                              <PlaySquare className="w-4 h-4" />
-                            </div>
-                            <div className="grow min-w-0">
-                              <div className="flex items-start gap-2 justify-between">
-                                <div className="flex flex-col justify-center items-start">
-                                  <h5 className="text-xs font-bold text-white truncate">
-                                    {lesson.name}
-                                  </h5>
+                          <div className="p-2 rounded-lg bg-[#e2ec00]/10 text-[#e2ec00] shrink-0 mt-0.5">
+                            <PlaySquare className="w-4 h-4" />
+                          </div>
+                          <div className="grow min-w-0">
+                            <div className="flex items-start gap-2 justify-between w-full">
+                              <div className="flex flex-col justify-center items-start min-w-0">
+                                <h5 className="text-xs font-bold text-white truncate w-full">
+                                  {lesson.name}
+                                </h5>
 
-                                  <p className="text-[11px] text-[#c9c8ab] mt-1 lead-relaxed line-clamp-2">
-                                    {lesson.description}
-                                  </p>
-                                  {lesson.youtubeVideoId && (
-                                    <span className="text-[9px] text-[#e2ec00]/60 font-mono mt-1 block">
-                                      Tip: Click a lesson to edit
-                                    </span>
-                                  )}
-                                </div>
+                                <p className="text-[11px] text-[#c9c8ab] mt-1 lead-relaxed line-clamp-2">
+                                  {lesson.description}
+                                </p>
+                              </div>
 
-                                <div className="flex items-center gap-1">
-                                  <span className="text-[9px] text-[#c9c8ab]/60 font-mono">
-                                    Order: {lesson.order}
-                                  </span>
-                                  <span className="text-[8px] bg-white/5 px-1.5 py-0.5 rounded font-bold uppercase text-[#e2ec00]">
-                                    {lesson.status}
-                                  </span>
+                              <div className="flex items-center gap-1 shrink-0">
+                                <span className="text-[9px] text-[#c9c8ab]/60 font-mono">
+                                  Order: {lesson.order}
+                                </span>
+                                <span className="text-[8px] bg-white/5 px-1.5 py-0.5 rounded font-bold uppercase text-[#e2ec00]">
+                                  {lesson.status}
+                                </span>
+
+                                <div className="flex items-center gap-1.5 ml-2 border-l border-white/10 pl-2">
+                                  <LessonForm
+                                    type="edit"
+                                    sectionName={section.name}
+                                    sectionId={section.id}
+                                    lesson={lesson}
+                                  >
+                                    <button
+                                      className="p-1.5 rounded-lg hover:bg-white/10 text-[#c9c8ab]/60 hover:text-[#e2ec00] transition-colors cursor-pointer"
+                                      title="Edit Lesson"
+                                    >
+                                      <Edit className="w-3.5 h-3.5" />
+                                    </button>
+                                  </LessonForm>
+                                  <DeleteLessonButton lessonId={lesson.id} lessonName={lesson.name} />
                                 </div>
                               </div>
                             </div>
                           </div>
-                        </LessonForm>
+                        </div>
                       ))
                     )}
                   </div>

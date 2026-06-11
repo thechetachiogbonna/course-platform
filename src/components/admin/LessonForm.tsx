@@ -1,7 +1,7 @@
 "use client";
 
-import { ReactNode } from "react";
-import { FolderOpen, Link, PlusCircle } from "lucide-react";
+import { ReactNode, useState } from "react";
+import { Edit, FolderOpen, Link, PlusCircle } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -37,68 +37,95 @@ import {
   selectTriggerClassName,
 } from "@/lib/form-styles";
 import { cn } from "@/lib/utils";
-import { createLesson } from "@/features/lessons/action";
+import { createLesson, updateLesson } from "@/features/lessons/action";
 import { toast } from "sonner";
 
 const lessonFormSchema = z.object({
   name: z.string().min(1, "Please enter a lesson name."),
   description: z.string(),
   youtubeVideoId: z.string().min(1, "Please proveide a youtube video Id"),
-  status: z.enum(["public", "private", "preview"]),
-  order: z.number().min(1, "Order must be at least 1."),
+  status: z.enum(["public", "private", "preview"])
 });
 
 type LessonFormValues = z.infer<typeof lessonFormSchema>;
 
 interface LessonFormProps {
+  type: "create" | "edit";
   sectionName: string;
   sectionId: string;
   children: ReactNode;
+  lesson?: Lesson;
+  nextLessonOrder?: number
 }
 
 export default function LessonForm({
+  type,
   sectionName,
   sectionId,
   children,
+  lesson,
+  nextLessonOrder
 }: LessonFormProps) {
+  const [open, setOpen] = useState(false);
   const form = useForm<LessonFormValues>({
     resolver: zodResolver(lessonFormSchema),
     defaultValues: {
-      name: "",
-      description: "",
-      youtubeVideoId: "",
-      status: "preview",
-      order: 1,
+      name: lesson?.name || "",
+      description: lesson?.description || "",
+      youtubeVideoId: lesson?.youtubeVideoId || "",
+      status: lesson?.status || "preview"
     },
   });
 
   const handleSubmit = async (values: LessonFormValues) => {
-    const result = await createLesson({ sectionId, ...values });
+    if (type === "create") {
+      if (!nextLessonOrder) {
+        toast.error("Missing next lesson order");
+        return;
+      }
 
-    if (result.error) {
-      toast.error(result.message);
-    } else {
-      form.reset();
-      toast.success(result.message);
+      const result = await createLesson({ sectionId, ...values, order: nextLessonOrder });
+  
+      if (result.error) {
+        toast.error(result.message);
+      } else {
+        form.reset();
+        toast.success(result.message);
+        setOpen(false);
+      }
+    }
+
+    if (type === "edit") {
+      if (!lesson) return; 
+      if (!lesson.id) return;
+      
+      const result = await updateLesson(lesson.id, { ...values, order: lesson.order });
+  
+      if (result.error) {
+        toast.error(result.message);
+      } else {
+        toast.success(result.message);
+        setOpen(false);
+      }
     }
   };
 
   return (
-    <Dialog>
-      <DialogTrigger className="flex w-full items-start">
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
         {children}
       </DialogTrigger>
       <DialogContent className={dialogContentClassName} showCloseButton={false}>
         <div className="w-full flex-1 space-y-8">
           <section className="space-y-3">
             <DialogTitle className="font-sans text-3xl font-extrabold tracking-tight text-white">
-              New Lesson
+             {type === "create" ? "New Lesson" : "Edit Lesson"}
             </DialogTitle>
 
             <div className="inline-flex items-center gap-2 rounded-xl border border-white/5 bg-[#201f1f] px-3 py-2 shadow-inner">
               <FolderOpen className="h-4 w-4 text-[#e2ec00]" />
               <span className="text-xs leading-none font-medium text-[#c9c8ab]">
-                Adding to Section:{" "}
+                {type === "create" ? "Adding to Section: " : "Editing: "}
                 <span className="font-semibold text-[#e2ec00]">
                   {sectionName}
                 </span>
@@ -189,7 +216,7 @@ export default function LessonForm({
                 )}
               />
 
-              <div className="grid grid-cols-2 gap-4">
+              {/* <div className="grid grid-cols-2 gap-4"> */}
                 <FormField
                   control={form.control}
                   name="status"
@@ -219,33 +246,7 @@ export default function LessonForm({
                     </FormItem>
                   )}
                 />
-
-                <FormField
-                  control={form.control}
-                  name="order"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel
-                        className={cn(fieldLabelAltClassName, "ml-1 block")}
-                      >
-                        Display Order
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          min={1}
-                          className={fieldInputAltClassName}
-                          value={field.value}
-                          onChange={(e) =>
-                            field.onChange(parseInt(e.target.value, 10) || 1)
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+              {/* </div> */}
 
               <div className="flex flex-col gap-2 pt-4">
                 <Button
@@ -253,8 +254,8 @@ export default function LessonForm({
                   disabled={form.formState.isSubmitting}
                   className="flex h-auto w-full items-center justify-center gap-1.5 rounded-xl bg-[#e2ec00] py-4 text-xs font-bold tracking-wider text-[#1c1d00] uppercase shadow-[0_4px_12px_rgba(226,236,0,0.15)] hover:brightness-110 active:scale-95"
                 >
-                  <PlusCircle className="h-4 w-4" />
-                  Add Lesson
+                  {type === "create" ? <PlusCircle className="h-4 w-4" /> : <Edit className="h-4 w-4" />}
+                  {type === "create" ? "Add Lesson" : "Update Lesson"}
                 </Button>
 
                 <DialogClose asChild>
