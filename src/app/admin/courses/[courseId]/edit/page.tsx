@@ -35,8 +35,7 @@ const getCourseSectionsLessons = async (courseId: string) => {
       LEFT JOIN lessons l
         ON s.id = l.section_id
       WHERE c.id = $1
-      ORDER BY s.created_at, l.created_at
-    `,
+      ORDER BY s.order ASC, l.order ASC`,
     [courseId],
   );
 

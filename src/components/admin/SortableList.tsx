@@ -59,7 +59,7 @@ export function SortableList<T extends { id: string }>({ lists, children, orderC
 }
 
 export function SortableItem({ children, id, index, isPending, listType }: { children: ReactNode, id: string, index: number, isPending: boolean, listType: "section" | "lesson" }) {
-    const { ref, handleRef, isDragSource } = useSortable({ id, index });
+    const { ref, handleRef, isDragSource } = useSortable({ id, index, group: listType });
 
     return (
         <div
@@ -72,7 +72,7 @@ export function SortableItem({ children, id, index, isPending, listType }: { chi
                     ref={handleRef}
                     className={cn("p-2 rounded-lg shrink-0 mt-0.5 hover:cursor-grab h-max", isPending && "opacity-50 cursor-not-allowed", listType === "section" && "mt-6")}
                 >
-                    <GripVertical className="w-4 h-4" />
+                    <GripVertical aria-hidden={isPending} aria-disabled={isPending} className="w-4 h-4" />
                 </div>
                 <div className="w-full">
                     {children}
