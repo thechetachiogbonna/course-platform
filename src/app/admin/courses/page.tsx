@@ -27,9 +27,10 @@ const getCourses = async () => {
       GROUP BY c.id
       ORDER BY c.created_at DESC;
     `)
-    const result = courses.rows
+    
+  const result = courses.rows
 
- return result;
+  return result;
 }
 
 export default async function CoursesPage() {

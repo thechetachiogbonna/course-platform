@@ -39,6 +39,7 @@ import {
 import { cn } from "@/lib/utils";
 import { createLesson, updateLesson } from "@/features/lessons/action";
 import { toast } from "sonner";
+import YouTubeVideoPlayer from "./YoutubeVideoPlayer";
 
 const lessonFormSchema = z.object({
   name: z.string().min(1, "Please enter a lesson name."),
@@ -109,6 +110,8 @@ export default function LessonForm({
       }
     }
   };
+
+  const youtubeVideoId = form.watch("youtubeVideoId")
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -186,6 +189,10 @@ export default function LessonForm({
                 )}
               />
 
+              {youtubeVideoId && (
+                <YouTubeVideoPlayer videoId={youtubeVideoId} />
+              )}
+
               <FormField
                 control={form.control}
                 name="youtubeVideoId"
@@ -202,7 +209,7 @@ export default function LessonForm({
                           <Link className="h-4 w-4" />
                         </span>
                         <Input
-                          placeholder="dQw4w9WgXcQ"
+                          placeholder="youtube video id"
                           className={cn(
                             fieldInputAltClassName,
                             "pl-12 font-mono",

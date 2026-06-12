@@ -1,15 +1,11 @@
 "use client";
 
-import React from "react";
 import { LayoutDashboard, Boxes, BookOpen, Settings } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { useUser } from "@clerk/nextjs";
 
-interface NavigationProps {
-  unreadCount?: number;
-}
-
-export const Navigation: React.FC<NavigationProps> = ({ unreadCount = 3 }) => {
+export default function Navigation() {
   const mainNavItems = [
     {
       id: "products",
@@ -31,7 +27,9 @@ export const Navigation: React.FC<NavigationProps> = ({ unreadCount = 3 }) => {
     },
   ];
 
+  const { user }  = useUser()
   const pathname = usePathname();
+
   return (
     <>
       {/* Desktop Sidebar */}
@@ -40,10 +38,7 @@ export const Navigation: React.FC<NavigationProps> = ({ unreadCount = 3 }) => {
         <div className="px-6 mb-8 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-xl font-extrabold tracking-tight text-white font-sans">
-              Nudge AI{" "}
-              <span className="text-[#e2ec00] font-mono font-medium">
-                Sales
-              </span>
+              Course Platform
             </span>
           </div>
         </div>
@@ -53,18 +48,18 @@ export const Navigation: React.FC<NavigationProps> = ({ unreadCount = 3 }) => {
           <div className="flex items-center gap-3 p-3 rounded-xl bg-[#201f1f] border border-[#2d2a2a]">
             <div className="w-10 h-10 rounded-full border border-[#e2ec00]/40 overflow-hidden relative bg-[#2a2a29] shrink-0">
               <img
-                alt="Michael"
-                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCi6LlnmWK9j4HhC8DhyUuVw-oAz56CtOuRtRVPYUcPONjt3GZMn6zOU74A7zrsM2kE6tmydnyJg309T-zuby8YNf2bD-lOrtJ8MN0nLq1m7vz5AX4jv9vF3quk5HzuASLx4h9W98arHYJSDvNGOGWsJphbwdHbfh2QIFF2R842GI4SCgUAwkV8fLLtIpwnFjvyv8UFtm4ZzSSdWhmEDmszRemja6m-2AqXeMkIWqUWSmn3mzw8RS5alHiQuGyvV-7pL-gg_Pb4duE"
+                alt={`${user?.firstName} ${user?.lastName}`}
+                src={user?.imageUrl}
                 className="w-full h-full object-cover"
                 referrerPolicy="no-referrer"
               />
             </div>
             <div className="truncate">
               <p className="font-semibold text-sm text-white truncate">
-                Michael
+                {user?.firstName} {user?.lastName}
               </p>
               <p className="text-xs text-[#c9c8ab] font-medium truncate">
-                Pro DJ Path
+                {user?.emailAddresses[0].emailAddress}
               </p>
             </div>
           </div>

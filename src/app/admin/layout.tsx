@@ -1,4 +1,4 @@
-import { Navigation } from "@/components/admin/Navigation";
+import Navigation from "@/components/admin/Navigation";
 
 export default function AdminLayout({
   children,

@@ -29,7 +29,6 @@ const getAllProducts = async () => {
 
 export default async function ProductsPage() {
   const products = await getAllProducts();
-  console.log(products)
   // const [searchQuery, setSearchQuery] = useState("");
   // const [filterStatus, setFilterStatus] = useState<
   //   "All" | "Public" | "Private"
@@ -75,10 +74,10 @@ export default async function ProductsPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight text-white font-sans">
-            Inventory <span className="text-[#e2ec00] font-mono">Catalog</span>
+            Products
           </h1>
           <p className="text-sm text-[#c9c8ab]">
-            Monitor, deploy, and configure technical learning devices.
+            View, create, update, delete, and manage products.
           </p>
         </div>
       </div>
