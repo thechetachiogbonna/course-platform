@@ -103,3 +103,32 @@ export const deleteLesson = async (lessonId: string) => {
     };
   }
 };
+
+export const updateLessonOrder = async (lessonIds: string[]) => {
+  try {
+    await db.query(
+      `
+        UPDATE lessons
+        SET "order" = i.idx::int
+        FROM (
+          SELECT id, idx
+          FROM unnest($1::uuid[]) WITH ORDINALITY AS t(id, idx)
+        ) i
+        WHERE lessons.id = i.id;
+      `,
+      [lessonIds]
+    );
+
+    return {
+      error: false,
+      message: "Lesson order changed successfully",
+    };
+  } catch (error) {
+    console.error("Error changing lesson order:", error);
+    return {
+      error: true,
+      message:
+        error instanceof Error ? error.message : "Failed to change lesson order",
+    };
+  }
+};

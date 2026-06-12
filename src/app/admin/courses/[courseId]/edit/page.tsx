@@ -1,9 +1,10 @@
 import LessonForm from "@/components/admin/LessonForm";
 import SectionForm from "@/components/admin/SectionForm";
-import DeleteLessonButton from "@/components/admin/DeleteLessonButton";
 import DeleteSectionButton from "@/components/admin/DeleteSectionButton";
 import { db } from "@/database/db";
-import { FolderOpen, PlaySquare, Plus, Edit } from "lucide-react";
+import { FolderOpen, Plus, Edit } from "lucide-react";
+import SortableLessonList from "@/components/admin/SortableLessonList";
+import SortableSectionList from "@/components/admin/SortableSectionList";
 
 interface CourseDetails extends Course {
   sections: (Section & { lessons: Lesson[] })[];
@@ -113,133 +114,7 @@ async function EditCoursePage({
           </SectionForm>
         </div>
 
-        {course.sections.length === 0 ? (
-          <div className="text-center py-8 text-gray-500 text-xs font-mono">
-            Syllabus structure empty. Click "Add Section" to compile curriculum
-            blocks.
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {course.sections.map((section, idx) => {
-              return (
-                <div
-                  key={section.id}
-                  className="border border-[#252525] bg-[#111]/40 rounded-xl overflow-hidden"
-                >
-                  {/* Section Header */}
-                  <div className="bg-[#1e1e1e]/60 p-4 flex items-center justify-between border-b border-[#252525]/40 flex-wrap gap-2">
-                    <div>
-                      <span className="text-[10px] text-[#c9c8ab] font-mono">
-                        SECTION #{section.order}
-                      </span>
-                      <h4 className="text-sm font-bold text-white mt-0.5">
-                        {section.name}
-                      </h4>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] bg-white/5 border border-white/10 text-[#c9c8ab] px-2 py-0.5 rounded font-mono uppercase">
-                        {section.status}
-                      </span>
-
-                      {/* Section edit/delete actions */}
-                      <div className="flex items-center gap-1 border-r border-white/10 pr-2">
-                        <SectionForm
-                          type="edit"
-                          courseName={course.name}
-                          courseId={courseId}
-                          section={section}
-                        >
-                          <button
-                            className="p-1.5 rounded-lg hover:bg-white/10 text-[#c9c8ab]/60 hover:text-[#e2ec00] transition-colors cursor-pointer"
-                            title="Edit Section"
-                          >
-                            <Edit className="w-3.5 h-3.5" />
-                          </button>
-                        </SectionForm>
-                        <DeleteSectionButton sectionId={section.id} sectionName={section.name} />
-                      </div>
-
-                      <LessonForm
-                        type="create"
-                        sectionName={section.name}
-                        sectionId={section.id}
-                        nextLessonOrder={section.lessons.length + 1}
-                      >
-                        <div
-                          className="cursor-pointer text-[#e2ec00] hover:text-white border border-[#e2ec00]/20 hover:border-[#e2ec00] text-[10px] font-bold py-1 px-3 rounded-lg flex items-center gap-1 transition-all"
-                        >
-                          <Plus className="w-3 h-3" />
-                          <span>Add Lesson</span>
-                        </div>
-                      </LessonForm>
-                    </div>
-                  </div>
-
-                  {/* Section Lessons */}
-                  <div className="divide-y divide-[#252525]/20">
-                    {section.lessons.length === 0 ? (
-                      <div className="p-4 text-center text-xs text-gray-500 italic">
-                        No lessons recorded in this section module. Press "Add
-                        Lesson" to populate clips.
-                      </div>
-                    ) : (
-                      section.lessons.map((lesson) => (
-                        <div
-                          key={lesson.id}
-                          className="w-full p-4 flex items-start gap-3 hover:bg-white/5 transition-colors"
-                        >
-                          <div className="p-2 rounded-lg bg-[#e2ec00]/10 text-[#e2ec00] shrink-0 mt-0.5">
-                            <PlaySquare className="w-4 h-4" />
-                          </div>
-                          <div className="grow min-w-0">
-                            <div className="flex items-start gap-2 justify-between w-full">
-                              <div className="flex flex-col justify-center items-start min-w-0">
-                                <h5 className="text-xs font-bold text-white truncate w-full">
-                                  {lesson.name}
-                                </h5>
-
-                                <p className="text-[11px] text-[#c9c8ab] mt-1 lead-relaxed line-clamp-2">
-                                  {lesson.description}
-                                </p>
-                              </div>
-
-                              <div className="flex items-center gap-1 shrink-0">
-                                <span className="text-[9px] text-[#c9c8ab]/60 font-mono">
-                                  Order: {lesson.order}
-                                </span>
-                                <span className="text-[8px] bg-white/5 px-1.5 py-0.5 rounded font-bold uppercase text-[#e2ec00]">
-                                  {lesson.status}
-                                </span>
-
-                                <div className="flex items-center gap-1.5 ml-2 border-l border-white/10 pl-2">
-                                  <LessonForm
-                                    type="edit"
-                                    sectionName={section.name}
-                                    sectionId={section.id}
-                                    lesson={lesson}
-                                  >
-                                    <button
-                                      className="p-1.5 rounded-lg hover:bg-white/10 text-[#c9c8ab]/60 hover:text-[#e2ec00] transition-colors cursor-pointer"
-                                      title="Edit Lesson"
-                                    >
-                                      <Edit className="w-3.5 h-3.5" />
-                                    </button>
-                                  </LessonForm>
-                                  <DeleteLessonButton lessonId={lesson.id} lessonName={lesson.name} />
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
+        <SortableSectionList course={course} sections={course.sections} />
       </div>
     </>
   );
