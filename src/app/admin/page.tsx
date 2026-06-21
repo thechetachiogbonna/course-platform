@@ -249,20 +249,6 @@ export default async function ProductsPage() {
           })}
         </div>
       )}
-
-      {/* Floating Action Button (FAB) */}
-      <button
-        id="inventory-fab"
-        // onClick={onAddProductClick}
-        className="fixed bottom-6 right-6 md:bottom-8 md:right-8 w-14 h-14 bg-[#e2ec00] hover:scale-110 active:scale-95 transition-all shadow-[0_8px_32px_rgba(226,236,0,0.35)] rounded-full flex items-center justify-center z-40 group focus:outline-none"
-      >
-        <Plus className="w-7 h-7 text-[#1c1d00]" />
-
-        {/* Tooltip on hover */}
-        <span className="absolute right-16 bg-[#1e1e1d] border border-[#2d2d2c] text-white text-[11px] font-bold px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 shadow-xl transition-opacity pointer-events-none whitespace-nowrap uppercase tracking-wider">
-          Add New SKU
-        </span>
-      </button>
     </div>
   );
 }

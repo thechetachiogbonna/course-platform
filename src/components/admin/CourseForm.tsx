@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { ArrowLeft, Plus } from "lucide-react"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
+import { useState } from "react";
+import { ArrowLeft, Plus } from "lucide-react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 import {
   Dialog,
   DialogClose,
@@ -12,10 +12,10 @@ import {
   DialogDescription,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Form,
   FormControl,
@@ -23,24 +23,24 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
+} from "@/components/ui/form";
 import {
   cancelButtonClassName,
   dialogContentClassName,
   fieldInputClassName,
   fieldLabelClassName,
   submitButtonClassName,
-} from "@/lib/form-styles"
-import { cn } from "@/lib/utils"
-import { createCourse } from "@/features/courses/action"
-import { toast } from "sonner"
+} from "@/lib/form-styles";
+import { cn } from "@/lib/utils";
+import { createCourse } from "@/features/courses/action";
+import { toast } from "sonner";
 
 const courseFormSchema = z.object({
   name: z.string().min(1, "Please enter a course name."),
-  description: z.string()
-})
+  description: z.string(),
+});
 
-type CourseFormValues = z.infer<typeof courseFormSchema>
+type CourseFormValues = z.infer<typeof courseFormSchema>;
 
 export default function CourseForm() {
   const [open, setOpen] = useState(false);
@@ -48,27 +48,25 @@ export default function CourseForm() {
     resolver: zodResolver(courseFormSchema),
     defaultValues: {
       name: "",
-      description: ""
+      description: "",
     },
-  })
+  });
 
   const handleSubmit = async (values: CourseFormValues) => {
-    const result = await createCourse(values)
+    const result = await createCourse(values);
     if (result.error) {
-      toast.error(result.message)
+      toast.error(result.message);
     } else {
-      form.reset()
-      toast.success(result.message)
-      setOpen(false)
+      form.reset();
+      toast.success(result.message);
+      setOpen(false);
     }
-  }
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button
-          className="w-full md:w-auto bg-[#e2ec00] text-[#1c1d00] hover:brightness-110 active:scale-95 transition-all px-5 py-3 rounded-xl font-bold text-xs tracking-wider flex items-center gap-1.5 shadow-[0_4px_12px_rgba(226,236,0,0.15)] uppercase select-none cursor-pointer"
-        >
+        <button className="w-full md:w-auto bg-[#e2ec00] text-[#1c1d00] hover:brightness-110 active:scale-95 transition-all px-5 py-3 rounded-xl font-bold text-xs tracking-wider flex items-center gap-1.5 shadow-[0_4px_12px_rgba(226,236,0,0.15)] uppercase select-none cursor-pointer">
           <Plus className="w-4 h-4" />
           <span>New Course</span>
         </button>
@@ -143,7 +141,10 @@ export default function CourseForm() {
                       <Textarea
                         rows={5}
                         placeholder="Describe the learning outcomes and target audience..."
-                        className={cn(fieldInputClassName, "min-h-0 resize-none")}
+                        className={cn(
+                          fieldInputClassName,
+                          "min-h-0 resize-none",
+                        )}
                         {...field}
                       />
                     </FormControl>
@@ -153,8 +154,14 @@ export default function CourseForm() {
               />
 
               <div className="space-y-3 pt-4">
-                <Button type="submit" className={submitButtonClassName} disabled={form.formState.isSubmitting}>
-                  {form.formState.isSubmitting ? "Creating..." : "Create Course"}
+                <Button
+                  type="submit"
+                  className={submitButtonClassName}
+                  disabled={form.formState.isSubmitting}
+                >
+                  {form.formState.isSubmitting
+                    ? "Creating..."
+                    : "Create Course"}
                 </Button>
 
                 <DialogClose asChild>
@@ -172,5 +179,5 @@ export default function CourseForm() {
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

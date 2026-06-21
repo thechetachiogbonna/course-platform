@@ -47,7 +47,7 @@ const getCourseSectionsLessons = async (courseId: string) => {
     description: firstRow.course_description,
     updated_at: firstRow.updated_at,
     sections: [],
-  } as CourseDetails
+  } as CourseDetails;
 
   const sectionMap = new Map();
 
@@ -105,7 +105,12 @@ async function EditCoursePage({
             </div>
           </div>
 
-          <SectionForm type="create" courseName={course.name} courseId={courseId} nextSectionOrder={course.sections.length + 1}>
+          <SectionForm
+            type="create"
+            courseName={course.name}
+            courseId={courseId}
+            nextSectionOrder={course.sections.length + 1}
+          >
             <button className="bg-[#e2ec00]/10 border border-[#e2ec00]/30 text-[#e2ec00] text-xs font-bold py-2 px-4 rounded-xl hover:bg-[#e2ec00]/20 transition-all flex items-center gap-1 uppercase tracking-wider cursor-pointer">
               <Plus className="w-3.5 h-3.5" />
               <span>New Section</span>

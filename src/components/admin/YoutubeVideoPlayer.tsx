@@ -12,7 +12,7 @@ export default function YouTubeVideoPlayer({
   return (
     <YouTube
       videoId={videoId}
-      className="w-full h-full"
+      className="aspect-video"
       opts={{ width: "100%", height: "100%" }}
       onEnd={onFinishedVideo}
     />
