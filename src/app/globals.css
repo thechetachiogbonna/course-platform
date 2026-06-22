@@ -48,6 +48,7 @@
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
   --color-background-dark: #0f0f0f;
+  --color-brand-yellow: #e2ec00;
   --font-sans: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", "Fira Code", monospace;
   --font-hanken: "Hanken Grotesk", sans-serif;
@@ -129,7 +130,12 @@ body {
   overflow-x: hidden;
 }
 
-/* Custom electric glow effect */
+.glass-card {
+  background: rgba(26, 26, 26, 0.82);
+  backdrop-filter: blur(20px);
+  border: 1px solid #252525;
+}
+
 .electric-glow {
   box-shadow: 0 0 15px rgba(226, 236, 0, 0.15);
 }
@@ -138,7 +144,6 @@ body {
   box-shadow: 0 8px 32px rgba(226, 236, 0, 0.25);
 }
 
-/* Smooth custom scrollbars for dark tech design */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;

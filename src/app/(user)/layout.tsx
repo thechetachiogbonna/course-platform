@@ -1,19 +1,20 @@
-import Navigation from "@/components/admin/Navigation";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import Navigation from "@/components/user/Navigation";
 
-export default function AdminLayout({
+export default function UserLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <SidebarProvider>
-      <div className="flex min-h-screen w-screen overflow-hidden">
+    <TooltipProvider>
+      <SidebarProvider>
         <Navigation />
         <main className="flex gap-6 flex-1 w-full max-w-7xl mx-auto px-4 py-6 overflow-y-auto">
           {children}
         </main>
-      </div>
-    </SidebarProvider>
+      </SidebarProvider>
+    </TooltipProvider>
   );
 }

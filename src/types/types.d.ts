@@ -18,6 +18,7 @@ interface Product {
   price: number;
   imageUrl: string;
   status: "public" | "private";
+  created_at: Date;
 }
 
 interface Course {

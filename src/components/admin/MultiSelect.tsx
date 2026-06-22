@@ -1,62 +1,60 @@
-"use client"
+"use client";
 
-import { useMemo, useState } from "react"
-import { Check, Search, X } from "lucide-react"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { useMemo, useState } from "react";
+import { Check, Search, X } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Popover,
   PopoverAnchor,
   PopoverContent,
-} from "@/components/ui/popover"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { fieldInputClassName } from "@/lib/form-styles"
-import { cn } from "@/lib/utils"
+} from "@/components/ui/popover";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { fieldInputAltClassName } from "@/lib/form-styles";
+import { cn } from "@/lib/utils";
 
-interface ProductMultiSelectProps {
-  products: Product[]
-  value: string[]
-  onChange: (value: string[]) => void
-  placeholder?: string
-  emptyMessage?: string
-  inputClassName?: string
+interface CourseMultiSelectProps {
+  courses: Course[];
+  value: string[];
+  onChange: (value: string[]) => void;
+  placeholder?: string;
+  emptyMessage?: string;
 }
 
-export default function ProductMultiSelect({
-  products,
+export default function MultiSelect({
+  courses,
   value,
   onChange,
-  placeholder = "Search linked product SKU...",
-  emptyMessage = "No matching hardware SKUs found",
-  inputClassName,
-}: ProductMultiSelectProps) {
-  const [search, setSearch] = useState("")
-  const [open, setOpen] = useState(false)
+  placeholder = "Search courses to attach...",
+  emptyMessage = "No matching courses found",
+}: CourseMultiSelectProps) {
+  const [search, setSearch] = useState("");
+  const [open, setOpen] = useState(false);
 
-  const filteredProducts = useMemo(() => {
-    if (!search) return products
-    const query = search.toLowerCase()
-    return products.filter(
-      (p) =>
-        p.name.toLowerCase().includes(query) ||
-        p.sku.toLowerCase().includes(query),
-    )
-  }, [products, search])
+  const filteredCourses = useMemo(() => {
+    if (!search) return courses;
+    const query = search.toLowerCase();
+    return courses.filter(
+      (c) =>
+        c.name.toLowerCase().includes(query) ||
+        c.description.toLowerCase().includes(query),
+    );
+  }, [courses, search]);
 
-  const toggleProduct = (sku: string) => {
-    if (value.includes(sku)) {
-      onChange(value.filter((id) => id !== sku))
+  const toggleCourse = (id: string) => {
+    if (value.includes(id)) {
+      onChange(value.filter((courseId) => courseId !== id));
     } else {
-      onChange([...value, sku])
+      onChange([...value, id]);
     }
-  }
+  };
 
-  const removeProduct = (sku: string) => {
-    onChange(value.filter((id) => id !== sku))
-  }
+  const removeCourse = (id: string) => {
+    onChange(value.filter((courseId) => courseId !== id));
+  };
 
-  const selectedProducts = products.filter((p) => value.includes(p.sku))
+  const selectedCourses = courses.filter((c) => value.includes(c.id));
 
   return (
     <div className="space-y-2">
@@ -71,11 +69,11 @@ export default function ProductMultiSelect({
               placeholder={placeholder}
               value={search}
               onChange={(e) => {
-                setSearch(e.target.value)
-                setOpen(true)
+                setSearch(e.target.value);
+                setOpen(true);
               }}
               onFocus={() => setOpen(true)}
-              className={cn(fieldInputClassName, "pl-12", inputClassName)}
+              className={cn(fieldInputAltClassName, "pl-12")}
             />
           </div>
         </PopoverAnchor>
@@ -87,33 +85,33 @@ export default function ProductMultiSelect({
           onOpenAutoFocus={(e) => e.preventDefault()}
         >
           <ScrollArea className="max-h-48">
-            {filteredProducts.length === 0 ? (
+            {filteredCourses.length === 0 ? (
               <div className="p-3 text-xs text-gray-500 italic">
                 {emptyMessage}
               </div>
             ) : (
               <div className="divide-y divide-white/5">
-                {filteredProducts.map((p) => {
-                  const isSelected = value.includes(p.sku)
+                {filteredCourses.map((c) => {
+                  const isSelected = value.includes(c.id);
                   return (
                     <Button
-                      key={p.id}
+                      key={c.id}
                       type="button"
                       variant="ghost"
-                      onClick={() => toggleProduct(p.sku)}
+                      onClick={() => toggleCourse(c.id)}
                       className="h-auto w-full justify-between rounded-none p-3 text-left text-xs text-gray-300 hover:bg-white/5 hover:text-white"
                     >
                       <div>
-                        <p className="font-semibold">{p.name}</p>
+                        <p className="font-semibold">{c.name}</p>
                         <p className="text-[10px] text-gray-500">
-                          {p.sku} — ${p.price}
+                          {c.description}
                         </p>
                       </div>
                       {isSelected && (
                         <Check className="h-4 w-4 shrink-0 text-[#e2ec00]" />
                       )}
                     </Button>
-                  )
+                  );
                 })}
               </div>
             )}
@@ -121,20 +119,20 @@ export default function ProductMultiSelect({
         </PopoverContent>
       </Popover>
 
-      {selectedProducts.length > 0 && (
+      {selectedCourses.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
-          {selectedProducts.map((p) => (
+          {selectedCourses.map((c) => (
             <Badge
-              key={p.id}
+              key={c.id}
               variant="outline"
               className="gap-1 border-[#252525] bg-[#1a1a1a] px-2 py-1 text-[10px] text-gray-300"
             >
-              {p.sku}
+              {c.name}
               <button
                 type="button"
-                onClick={() => removeProduct(p.sku)}
+                onClick={() => removeCourse(c.id)}
                 className="rounded-full hover:text-white"
-                aria-label={`Remove ${p.sku}`}
+                aria-label={`Remove ${c.name}`}
               >
                 <X className="h-3 w-3" />
               </button>
@@ -143,5 +141,5 @@ export default function ProductMultiSelect({
         </div>
       )}
     </div>
-  )
+  );
 }

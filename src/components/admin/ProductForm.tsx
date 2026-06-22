@@ -1,26 +1,20 @@
-"use client"
+"use client";
 
-import { useMemo } from "react"
-import {
-  ChevronRight,
-  FileText,
-  Link,
-  DollarSign,
-  Eye,
-} from "lucide-react"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
+import { useMemo } from "react";
+import { ChevronRight, FileText, Link, DollarSign, Eye } from "lucide-react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 import {
   Form,
   FormControl,
@@ -28,17 +22,16 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form"
-import CourseMultiSelect from "@/components/admin/CourseMultiSelect"
-import { INITIAL_COURSES } from "@/app/constants"
+} from "@/components/ui/form";
+import MultiSelect from "@/components/admin/MultiSelect";
 import {
   fieldInputAltClassName,
   fieldLabelAltClassName,
   selectTriggerDarkClassName,
-} from "@/lib/form-styles"
-import { cn } from "@/lib/utils"
-import { createProduct, updateProduct } from "@/features/products/action"
-import { toast } from "sonner"
+} from "@/lib/form-styles";
+import { cn } from "@/lib/utils";
+import { createProduct, updateProduct } from "@/features/products/action";
+import { toast } from "sonner";
 
 const productFormSchema = z.object({
   name: z.string().min(1, "Please specify a valid product name."),
@@ -47,22 +40,22 @@ const productFormSchema = z.object({
   imageUrl: z.string(),
   price: z.number().min(0, "Price must be zero or greater."),
   status: z.enum(["public", "private"]),
-})
+});
 
-type ProductFormValues = z.infer<typeof productFormSchema>
+type ProductFormValues = z.infer<typeof productFormSchema>;
 
 interface ProductFormProps {
   type: "create" | "edit";
-  selectedCourses?: Course[]
-  initialProduct?: Product | null
-  courses: Course[]
+  selectedCourses?: Course[];
+  initialProduct?: Product | null;
+  courses: Course[];
 }
 
 export default function ProductForm({
   type,
   selectedCourses,
   initialProduct,
-  courses
+  courses,
 }: ProductFormProps) {
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productFormSchema),
@@ -74,7 +67,7 @@ export default function ProductForm({
       price: initialProduct?.price ?? 0,
       status: initialProduct?.status ?? "public",
     },
-  })
+  });
 
   const {
     name: watchedName,
@@ -83,13 +76,15 @@ export default function ProductForm({
     imageUrl,
     price: watchedPrice,
     status: watchedStatus,
-  } = form.watch()
+  } = form.watch();
 
   const haveNotBeenEditted = useMemo(() => {
-    if (!initialProduct) return false
+    if (!initialProduct) return false;
 
-    const initialCourseIds = [...(initialProduct.courses?.map((c) => c.id) || [])].sort()
-    const currentCourseIds = [...(watchedCourseIds || [])].sort()
+    const initialCourseIds = [
+      ...(initialProduct.courses?.map((c) => c.id) || []),
+    ].sort();
+    const currentCourseIds = [...(watchedCourseIds || [])].sort();
 
     return (
       initialProduct.name === (watchedName || "").trim() &&
@@ -98,7 +93,7 @@ export default function ProductForm({
       initialProduct.imageUrl === (imageUrl || "").trim() &&
       initialProduct.price === watchedPrice &&
       initialProduct.status === watchedStatus
-    )
+    );
   }, [
     initialProduct,
     watchedName,
@@ -107,7 +102,7 @@ export default function ProductForm({
     imageUrl,
     watchedPrice,
     watchedStatus,
-  ])
+  ]);
 
   const handleSubmit = async (values: ProductFormValues) => {
     if (type === "create") {
@@ -122,7 +117,7 @@ export default function ProductForm({
     }
 
     if (type === "edit") {
-      if (!initialProduct) return
+      if (!initialProduct) return;
 
       const result = await updateProduct(initialProduct.id, values);
 
@@ -132,8 +127,7 @@ export default function ProductForm({
         toast.success(result.message);
       }
     }
-
-  }
+  };
 
   return (
     <div className="mx-auto w-full max-w-3xl flex-1 space-y-8 pb-32">
@@ -149,15 +143,13 @@ export default function ProductForm({
           {type === "create" ? "Add New Product" : "Edit Product"}
         </h2>
         <p className="text-sm text-[#c9c8ab]">
-          Configure details, pricing, and availability settings for your product.
+          Configure details, pricing, and availability settings for your
+          product.
         </p>
       </section>
 
       <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(handleSubmit)}
-          className="space-y-6"
-        >
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
           <div className="space-y-5 rounded-2xl border border-[#252525] bg-[#1a1a1a]/80 p-6 backdrop-blur-md">
             <div className="flex items-center gap-2 border-b border-[#252525]/50 pb-3">
               <FileText className="h-5 w-5 text-[#e2ec00]" />
@@ -196,7 +188,7 @@ export default function ProductForm({
                       Attach Course(s)
                     </FormLabel>
                     <FormControl>
-                      <CourseMultiSelect
+                      <MultiSelect
                         courses={courses}
                         value={field.value}
                         onChange={field.onChange}
@@ -381,5 +373,5 @@ export default function ProductForm({
         </form>
       </Form>
     </div>
-  )
+  );
 }
