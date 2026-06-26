@@ -32,7 +32,7 @@ const getCourseSectionsLessons = async (courseId: string) => {
         ON c.id = s.course_id
       JOIN lessons l
         ON s.id = l.section_id
-      WHERE c.id = $1 AND l.status IN ('preview', 'public')
+      WHERE c.id = $1 AND s.status = 'public' AND l.status IN ('preview', 'public')
       ORDER BY s.order ASC, l.order ASC
     `,
     [courseId],

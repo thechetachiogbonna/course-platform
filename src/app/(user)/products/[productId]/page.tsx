@@ -4,6 +4,7 @@ import { db } from "@/database/db";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { formatString } from "@/lib/utils";
+import Price from "@/components/user/Price";
 
 interface ProductInterface {
   id: string;
@@ -41,7 +42,7 @@ async function getProduct(id: string) {
         ON s.course_id = c.id
       LEFT JOIN lessons l
         ON l.section_id = s.id
-      WHERE p.id = $1
+      WHERE p.id = $1 AND p.status = 'public' AND s.status = 'public' AND l.status = 'public'
       GROUP BY p.id, c.id, c.name, c.description
     `,
     [id],
@@ -219,12 +220,7 @@ export default async function ProductDetailPage({
           <div className="glass-card rounded-xl p-6 lg:sticky lg:top-24 electric-glow">
             {/* Price */}
             <div className="flex items-baseline gap-2 mb-6">
-              <span className="text-3xl font-extrabold text-white">
-                ${Number(product.price).toFixed(2)}
-              </span>
-              <span className="text-sm text-[#929277] line-through">
-                ${originalPrice}
-              </span>
+              <Price price={product.price} />
             </div>
 
             {/* CTAs */}

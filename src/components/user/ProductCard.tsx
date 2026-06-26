@@ -1,6 +1,5 @@
-"use client";
-
 import Link from "next/link";
+import Price from "./Price";
 
 interface ProductCardProps {
   product: Product;
@@ -50,14 +49,9 @@ export default function ProductCard({ product }: ProductCardProps) {
 
         {/* Action Bottom row */}
         <div className="mt-3 pt-3 border-t border-white/5 flex items-center justify-between">
-          <span className="font-display font-bold text-lg text-brand-yellow">
-            ${product.price.toFixed(2)}
-          </span>
+          <Price price={product.price} />
           <button
             className="bg-brand-yellow hover:bg-[#c6cf00] active:scale-95 text-black px-4 py-2 rounded-lg font-bold text-xs tracking-wide uppercase transition-all shadow-md"
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
           >
             Enroll Now
           </button>
