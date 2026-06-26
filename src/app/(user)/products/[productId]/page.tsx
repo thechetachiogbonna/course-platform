@@ -1,6 +1,4 @@
-import {
-  Star,
-} from "lucide-react";
+import { Star } from "lucide-react";
 import Image from "next/image";
 import { db } from "@/database/db";
 import { notFound } from "next/navigation";
@@ -13,7 +11,15 @@ interface ProductInterface {
   description: string;
   imageUrl: string;
   price: number;
-  courses: { id: string; name: string; description: string; section_count: number; lesson_count: number }[] | null;
+  courses:
+    | {
+        id: string;
+        name: string;
+        description: string;
+        section_count: number;
+        lesson_count: number;
+      }[]
+    | null;
 }
 
 async function getProduct(id: string) {
@@ -96,12 +102,18 @@ export default async function ProductDetailPage({
   if (!product) notFound();
 
   const originalPrice = (product.price * 2.5).toFixed(2);
-  const totalLessons = product.courses?.reduce((acc, course) => acc + course.lesson_count, 0);
-  const totalSections = product.courses?.reduce((acc, course) => acc + course.section_count, 0);
+  const totalLessons = product.courses?.reduce(
+    (acc, course) => acc + course.lesson_count,
+    0,
+  );
+  const totalSections = product.courses?.reduce(
+    (acc, course) => acc + course.section_count,
+    0,
+  );
 
   return (
     <div className="w-full max-w-5xl mx-auto pb-28">
-      <section className="relative w-full h-72 md:h-[400px] rounded-2xl overflow-hidden mb-8 mx-0">
+      <section className="relative w-full h-72 md:h-100 rounded-2xl overflow-hidden mb-8 mx-0">
         <Image
           src={product.imageUrl}
           alt={product.name}
@@ -120,13 +132,15 @@ export default async function ProductDetailPage({
 
           <div className="flex items-center gap-3 flex-wrap">
             <div className="flex items-center gap-1">
-              <span className="text-xs text-[#929277] ml-1">
-                1.2k students
-              </span>
+              <span className="text-xs text-[#929277] ml-1">1.2k students</span>
             </div>
             <span className="text-[#929277] text-xs">•</span>
             <span className="text-xs text-[#929277]">
-              {formatString({ number: Number(product.courses?.length), plural: "courses", singular: "course" })}
+              {formatString({
+                number: Number(product.courses?.length),
+                plural: "courses",
+                singular: "course",
+              })}
             </span>
           </div>
         </div>
@@ -148,8 +162,17 @@ export default async function ProductDetailPage({
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-bold text-white">Courses</h2>
               <span className="text-xs text-[#929277]">
-                {formatString({ number: Number(totalSections), plural: "Sections", singular: "Section" })} •{" "}
-                {formatString({ number: Number(totalLessons), plural: "Lessons", singular: "Lesson" })}
+                {formatString({
+                  number: Number(totalSections),
+                  plural: "Sections",
+                  singular: "Section",
+                })}{" "}
+                •{" "}
+                {formatString({
+                  number: Number(totalLessons),
+                  plural: "Lessons",
+                  singular: "Lesson",
+                })}
               </span>
             </div>
 
@@ -161,19 +184,25 @@ export default async function ProductDetailPage({
                     className="border border-[#252525] rounded-xl overflow-hidden transition-all duration-200"
                   >
                     {/* Header */}
-                    <div
-                      className="w-full flex items-center justify-between p-4 bg-[#1c1b1b] hover:bg-[#201f1f] transition-colors text-left"
-                    >
+                    <div className="w-full flex items-center justify-between p-4 bg-[#1c1b1b] hover:bg-[#201f1f] transition-colors text-left">
                       <div className="flex flex-col items-start gap-0.5">
                         <div className="text-sm font-semibold text-white">
                           {course.name}
                         </div>
                         <div className="flex items-center gap-1">
                           <span className="text-xs text-[#929277]">
-                            {formatString({ number: Number(course.section_count), plural: "Sections", singular: "Section" })}
+                            {formatString({
+                              number: Number(course.section_count),
+                              plural: "Sections",
+                              singular: "Section",
+                            })}
                           </span>
                           <span className="text-xs text-[#929277]">
-                            {formatString({ number: Number(course.lesson_count), plural: "Lessons", singular: "Lesson" })}
+                            {formatString({
+                              number: Number(course.lesson_count),
+                              plural: "Lessons",
+                              singular: "Lesson",
+                            })}
                           </span>
                         </div>
                       </div>

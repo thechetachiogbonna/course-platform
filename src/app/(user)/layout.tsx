@@ -11,7 +11,7 @@ export default function UserLayout({
     <TooltipProvider>
       <SidebarProvider>
         <Navigation />
-        <main className="flex gap-6 flex-1 w-full max-w-7xl mx-auto px-4 py-6 overflow-y-auto">
+        <main className="flex gap-6 flex-1 w-full max-w-375 mx-auto px-4 py-6 overflow-y-auto">
           {children}
         </main>
       </SidebarProvider>

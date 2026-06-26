@@ -136,6 +136,14 @@ body {
   border: 1px solid #252525;
 }
 
+.glow-bg {
+  background: radial-gradient(
+    circle at center,
+    rgba(244, 255, 0, 0.05) 0%,
+    transparent 70%
+  );
+}
+
 .electric-glow {
   box-shadow: 0 0 15px rgba(226, 236, 0, 0.15);
 }

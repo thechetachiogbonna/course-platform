@@ -49,7 +49,7 @@ export default function Navigation() {
             {/* Profile Card */}
             <div className="px-4 mb-6">
               <div className="flex items-center gap-3 p-3 rounded-xl bg-[#201f1f] border border-[#2d2a2a]">
-                <div className="w-10 h-10 rounded-full border border-[#e2ec00]/40 overflow-hidden relative bg-[#2a2a29] shrink-0">
+                <div className="w-10 h-10 rounded-full border border-brand-yellow/40 overflow-hidden relative bg-[#2a2a29] shrink-0">
                   <img
                     alt={`${user?.firstName} ${user?.lastName}`}
                     src={user?.imageUrl}
@@ -60,7 +60,7 @@ export default function Navigation() {
                 <div className="truncate">
                   <p className="font-semibold text-sm text-white truncate">
                     {user?.firstName} {user?.lastName}
-                  </p>
+                  </p> 
                   <p className="text-xs text-[#c9c8ab] font-medium truncate">
                     {user?.emailAddresses[0].emailAddress}
                   </p>
@@ -75,15 +75,13 @@ export default function Navigation() {
                 const currentPath: string | undefined = pathname.split("/")[2];
                 const isSelected = currentPath
                   ? item.id === currentPath
-                  : currentPath === undefined && item.id !== "products"
-                    ? false
-                    : true;
+                  : item.id === "products";
 
                 return (
                   <Link
                     className={`w-full flex items-center gap-3 py-3 px-4 rounded-xl transition-all duration-200 text-left ${
                       isSelected
-                        ? "bg-[#e2ec00] text-[#1c1d00] font-bold shadow-[0_4px_12px_rgba(226,236,0,0.2)]"
+                        ? "bg-brand-yellow text-[#1c1d00] font-bold shadow-[0_4px_12px_rgba(226,236,0,0.2)]"
                         : "text-[#c8c6c5] hover:text-white hover:bg-[#252524]"
                     }`}
                     href={item.href}
@@ -114,7 +112,7 @@ export default function Navigation() {
               <Link
                 className={`flex flex-col items-center justify-center transition-all ${
                   isSelected
-                    ? "text-[#e2ec00] bg-[#e2ec00]/10 px-3 py-1 rounded-full"
+                    ? "text-brand-yellow bg-brand-yellow/10 px-3 py-1 rounded-full"
                     : "text-gray-400 opacity-60 hover:opacity-100"
                 }`}
                 href={item.href}
@@ -130,7 +128,7 @@ export default function Navigation() {
           // onClick={() => onChangeView("settings")}
           className={`flex flex-col items-center justify-center transition-all ${
             pathname === "/settings"
-              ? "text-[#e2ec00] bg-[#e2ec00]/10 px-3 py-1 rounded-full"
+              ? "text-brand-yellow bg-brand-yellow/10 px-3 py-1 rounded-full"
               : "text-gray-400 opacity-60 hover:opacity-100"
           }`}
         >
