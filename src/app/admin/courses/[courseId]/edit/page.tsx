@@ -1,9 +1,6 @@
-import LessonForm from "@/components/admin/LessonForm";
 import SectionForm from "@/components/admin/SectionForm";
-import DeleteSectionButton from "@/components/admin/DeleteSectionButton";
 import { db } from "@/database/db";
-import { FolderOpen, Plus, Edit } from "lucide-react";
-import SortableLessonList from "@/components/admin/SortableLessonList";
+import { FolderOpen, Plus } from "lucide-react";
 import SortableSectionList from "@/components/admin/SortableSectionList";
 
 interface CourseDetails extends Course {

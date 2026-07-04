@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/database/db";
-import { clerkClient } from "@clerk/nextjs/server";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 
 export const createUser = async (userData: User) => {
   try {
@@ -104,3 +104,24 @@ export const syncDBUserToClerk = async ({
     },
   });
 };
+
+export async function getCurrentUser() {
+  const { userId, sessionClaims: _, redirectToSignIn } = await auth()
+
+  if (!userId) return redirectToSignIn()
+
+  const user = await getUser(userId)
+
+  return {
+    user
+  }
+}
+
+async function getUser(clerkUserId: string) {
+  const result = await db.query(
+    "SELECT * FROM users WHERE clerk_user_id = $1",
+    [clerkUserId],
+  )
+
+  return result.rows[0] as User
+}

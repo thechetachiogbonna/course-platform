@@ -1,17 +1,12 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
-import arcjet, {
-  detectBot,
-  detectPromptInjection,
-  sensitiveInfo,
-  shield,
-  tokenBucket,
-} from "@arcjet/next";
+import arcjet, { detectBot, shield, tokenBucket } from "@arcjet/next";
 import { NextResponse } from "next/server";
 import { setUserCountryHeader } from "./lib/user-country-header";
 
 const isPublicRoute = createRouteMatcher([
   "/sign-in(.*)",
   "/api/webhooks/clerk(.*)",
+  "/api/webhooks/stripe(.*)",
 ]);
 
 const isAdminRoute = createRouteMatcher(["/admin(.*)"]);
@@ -34,6 +29,10 @@ const aj = arcjet({
 });
 
 export default clerkMiddleware(async (auth, req) => {
+  if (req.nextUrl.pathname.startsWith("/api/webhooks")) {
+    return NextResponse.next();
+  }
+
   const decision = await aj.protect(
     process.env.TEST_IP_ADDRESS
       ? { ...req, ip: process.env.TEST_IP_ADDRESS, headers: req.headers }
@@ -44,25 +43,25 @@ export default clerkMiddleware(async (auth, req) => {
   );
 
   if (decision.isDenied()) {
-    return new NextResponse(null, { status: 403 })
+    return new NextResponse(null, { status: 403 });
   }
 
-  if (isAdminRoute(req)) {
-    const user = await auth.protect()
-    if (user.sessionClaims.role !== "admin") {
-      return new NextResponse(null, { status: 404 })
-    }
-  }
+  // if (isAdminRoute(req)) {
+  //   const user = await auth.protect();
+  //   if (user.sessionClaims.role !== "admin") {
+  //     return new NextResponse(null, { status: 404 });
+  //   }
+  // }
 
   if (!isPublicRoute(req)) {
     await auth.protect();
   }
 
   if (!decision.ip.isVpn() && !decision.ip.isProxy()) {
-    const headers = new Headers(req.headers)
-    setUserCountryHeader(headers, decision.ip.country)
+    const headers = new Headers(req.headers);
+    setUserCountryHeader(headers, decision.ip.country);
 
-    return NextResponse.next({ request: { headers } })
+    return NextResponse.next({ request: { headers } });
   }
 });
 

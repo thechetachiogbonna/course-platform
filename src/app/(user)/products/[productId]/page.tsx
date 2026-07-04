@@ -1,10 +1,11 @@
-import { Star } from "lucide-react";
 import Image from "next/image";
 import { db } from "@/database/db";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { formatString } from "@/lib/utils";
 import Price from "@/components/user/Price";
+import Link from "next/link";
+import { PlayCircle } from "lucide-react";
 
 interface ProductInterface {
   id: string;
@@ -31,19 +32,29 @@ async function getProduct(id: string) {
         c.id AS course_id,
         c.name AS course_name,
         c.description AS course_description,
-        COUNT(DISTINCT s.id) AS section_count,
-        COUNT(DISTINCT l.id) AS lesson_count
+        COALESCE(counts.section_count, 0) AS section_count,
+        COALESCE(counts.lesson_count, 0) AS lesson_count
       FROM products p
       LEFT JOIN course_products cp
         ON p.id = cp.product_id
       LEFT JOIN courses c
         ON c.id = cp.course_id
-      LEFT JOIN sections s
-        ON s.course_id = c.id
-      LEFT JOIN lessons l
-        ON l.section_id = s.id
-      WHERE p.id = $1 AND p.status = 'public' AND s.status = 'public' AND l.status = 'public'
-      GROUP BY p.id, c.id, c.name, c.description
+      LEFT JOIN (
+        SELECT
+          c.id AS course_id,
+          COUNT(DISTINCT s.id) AS section_count,
+          COUNT(DISTINCT l.id) AS lesson_count
+        FROM courses c
+        LEFT JOIN sections s
+          ON s.course_id = c.id
+          AND s.status = 'public'
+        LEFT JOIN lessons l
+          ON l.section_id = s.id
+          AND l.status IN ('public', 'preview')
+        GROUP BY c.id
+      ) counts ON counts.course_id = c.id
+      WHERE p.id = $1 AND p.status = 'public'
+      ORDER BY c.name ASC
     `,
     [id],
   );
@@ -52,7 +63,7 @@ async function getProduct(id: string) {
 
   const product = result.rows[0];
 
-  const coursesMap = new Map();
+  const coursesMap = new Map<string, any>();
 
   for (const row of result.rows) {
     if (!row.course_id) continue;
@@ -62,8 +73,8 @@ async function getProduct(id: string) {
         id: row.course_id,
         name: row.course_name,
         description: row.course_description,
-        section_count: row.section_count,
-        lesson_count: row.lesson_count,
+        section_count: Number(row.section_count || 0),
+        lesson_count: Number(row.lesson_count || 0),
       });
     }
   }
@@ -102,13 +113,12 @@ export default async function ProductDetailPage({
   const product = await getProduct(productId);
   if (!product) notFound();
 
-  const originalPrice = (product.price * 2.5).toFixed(2);
   const totalLessons = product.courses?.reduce(
-    (acc, course) => acc + course.lesson_count,
+    (acc, course) => acc + Number(course.lesson_count || 0),
     0,
   );
   const totalSections = product.courses?.reduce(
-    (acc, course) => acc + course.section_count,
+    (acc, course) => acc + Number(course.section_count || 0),
     0,
   );
 
@@ -190,22 +200,29 @@ export default async function ProductDetailPage({
                         <div className="text-sm font-semibold text-white">
                           {course.name}
                         </div>
-                        <div className="flex items-center gap-1">
-                          <span className="text-xs text-[#929277]">
-                            {formatString({
-                              number: Number(course.section_count),
-                              plural: "Sections",
-                              singular: "Section",
-                            })}
-                          </span>
-                          <span className="text-xs text-[#929277]">
-                            {formatString({
-                              number: Number(course.lesson_count),
-                              plural: "Lessons",
-                              singular: "Lesson",
-                            })}
-                          </span>
+
+                        <div className="mt-2 text-xs text-[#c9c8ab]">
+                          {formatString({
+                            number: Number(course.section_count),
+                            plural: "Sections",
+                            singular: "Section",
+                          })}{" "}
+                          •{" "}
+                          {formatString({
+                            number: Number(course.lesson_count),
+                            plural: "Lessons",
+                            singular: "Lesson",
+                          })}
                         </div>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <Link
+                          href={`/courses/${course.id}`}
+                          className="text-brand-yellow text-xs font-bold py-2 px-4 rounded-xl hover:bg-[#e2ec00]/10 transition-all flex items-center gap-1 uppercase tracking-wider cursor-pointer">
+                          <PlayCircle className="w-3.5 h-3.5" />
+                          <span>View Course</span>
+                        </Link>
                       </div>
                     </div>
                   </div>
@@ -225,12 +242,12 @@ export default async function ProductDetailPage({
 
             {/* CTAs */}
             <div className="space-y-3 mb-6">
-              <button
-                id="btn-buy-now"
-                className="w-full bg-brand-yellow hover:brightness-110 active:scale-95 text-[#1b1d00] font-bold text-sm py-3 rounded-xl transition-all shadow-md"
+              <Link
+                href={`/products/${product.id}/purchase`}
+                className="block text-center w-full bg-brand-yellow hover:brightness-110 active:scale-95 text-[#1b1d00] font-bold text-sm py-3 rounded-xl transition-all shadow-md"
               >
                 Buy Now
-              </button>
+              </Link>
             </div>
 
             {/* Instructor */}
