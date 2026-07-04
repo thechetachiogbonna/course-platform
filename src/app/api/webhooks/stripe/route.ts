@@ -2,8 +2,39 @@ import { stripe } from "@/config/stripe";
 import { db } from "@/database/db";
 import { addUserCourseAccess } from "@/features/courses/action";
 import { insertPurchase } from "@/features/purchases/action";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
+
+export async function GET(req: NextRequest) {
+  let redirectUrl;
+
+  try {
+    const sesisonId = req.nextUrl.searchParams.get("session_id")
+    const productId = req.nextUrl.searchParams.get("product_id")
+
+
+    if (!sesisonId || !productId) {
+      return NextResponse.redirect(new URL(`/products/purchase-failure`, req.url));
+    }
+
+    const session = await stripe.checkout.sessions.retrieve(sesisonId);
+
+    if (!session) {
+      redirectUrl = `/products/purchase-failure`;
+    }
+
+    if (session.payment_status !== "paid" || session.status !== "complete") {
+      redirectUrl = `/products/purchase-failure`;
+    } else {
+      redirectUrl = `/products/${productId}/purchase/success`;
+    }
+
+  } catch (error) {
+    redirectUrl = `/products/purchase-failure`;
+  }
+
+  return NextResponse.redirect(new URL(redirectUrl, req.url));
+}
 
 export async function POST(req: NextRequest) {
   try {

@@ -45,7 +45,7 @@ export async function getClientSecret(
       receipt_email: user.email,
     },
     discounts,
-    return_url: `${origin}/api/webhooks/stripe?session_id={CHECKOUT_SESSION_ID}`,
+    return_url: `${origin}/api/webhooks/stripe?session_id={CHECKOUT_SESSION_ID}&product_id=${product.id}`,
   });
 
   if (!session.client_secret) {
