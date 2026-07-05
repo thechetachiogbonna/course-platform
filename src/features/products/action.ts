@@ -121,3 +121,19 @@ export const updateProduct = async (id: string, productData: Pick<Product, "name
         };
     }
 }
+
+export const userOwnsProduct = async (userId: string, productId: string) => {
+    try {
+        const result = await db.query(`
+            SELECT 
+                *
+            FROM purchases
+            WHERE user_id = $1 AND product_id = $2
+        `, [userId, productId]);
+
+        return result.rows.length > 0;
+    } catch (error) {
+        console.error("Error fetching user owned products:", error);
+        return true;
+    }
+}

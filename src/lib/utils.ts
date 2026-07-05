@@ -19,3 +19,8 @@ export function formatPrice(amount: number, { showZeroAsNumber = false } = {}) {
   if (amount === 0 && !showZeroAsNumber) return "Free"
   return formatter.format(amount)
 }
+
+export const isProductNew = (productCreatedAt: Date) => {
+  const SEVEN_DAYS_IN_MS = 1000 * 60 * 60 * 24 * 7;
+  return new Date(productCreatedAt).getTime() > (new Date().getTime() - SEVEN_DAYS_IN_MS);
+}

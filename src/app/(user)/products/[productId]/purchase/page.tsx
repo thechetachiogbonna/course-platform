@@ -1,7 +1,8 @@
 import StripeCheckout from "@/components/user/StripeCheckoutPage";
 import { db } from "@/database/db";
+import { userOwnsProduct } from "@/features/products/action";
 import { getCurrentUser } from "@/features/users/action";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 const getPublicProduct = async (productId: string) => {
   const result = await db.query(
@@ -33,6 +34,12 @@ export default async function PurchasePage({
   const product = await getPublicProduct(productId);
 
   if (!product) return notFound();
+
+  if (await userOwnsProduct(user.id, productId)) {
+    return redirect("/");
+  }
+
+  console.log(await userOwnsProduct(user.id, productId))
 
   return <StripeCheckout product={product} user={user} />;
 }

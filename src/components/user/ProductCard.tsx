@@ -1,12 +1,13 @@
 import Link from "next/link";
 import Price from "./Price";
+import { isProductNew } from "@/lib/utils";
 
 interface ProductCardProps {
-  product: Product & { total_students: number };
+  product: Product & { total_students: number, hasPurchased: boolean };
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
-  const isNew = true;
+  const isNew = isProductNew(product.created_at)
 
   return (
     <div className="glass-card rounded-2xl overflow-hidden flex flex-col group hover:border-brand-yellow/50 hover:electric-glow transition-all duration-300">
@@ -49,12 +50,21 @@ export default function ProductCard({ product }: ProductCardProps) {
         {/* Action Bottom row */}
         <div className="mt-3 pt-3 border-t border-white/5 flex items-center justify-between">
           <Price price={product.price} />
-          <Link
-            href={`/products/${product.id}/purchase`}
-            className="bg-brand-yellow hover:bg-[#c6cf00] active:scale-95 text-black px-4 py-2 rounded-lg font-bold text-xs tracking-wide uppercase transition-all shadow-md"
-          >
-            Enroll Now
-          </Link>
+          {product.hasPurchased ? (
+            <Link
+              href={`/products/${product.id}`}
+              className="bg-brand-yellow hover:bg-[#c6cf00] active:scale-95 text-black px-4 py-2 rounded-lg font-bold text-xs tracking-wide uppercase transition-all shadow-md"
+            >
+              Go to Courses
+            </Link>
+          ) : (
+            <Link
+              href={`/products/${product.id}/purchase`}
+              className="bg-brand-yellow hover:bg-[#c6cf00] active:scale-95 text-black px-4 py-2 rounded-lg font-bold text-xs tracking-wide uppercase transition-all shadow-md"
+            >
+              Enroll Now
+            </Link>
+          )}
         </div>
       </div>
     </div>

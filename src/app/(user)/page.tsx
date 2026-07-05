@@ -1,5 +1,7 @@
 import ProductCard from "@/components/user/ProductCard";
 import { db } from "@/database/db";
+import { userOwnsProduct } from "@/features/products/action";
+import { getCurrentUser } from "@/features/users/action";
 import { BookOpen, Search } from "lucide-react";
 
 const getPublicProducts = async () => {
@@ -22,7 +24,20 @@ const getPublicProducts = async () => {
 };
 
 async function page() {
-  const products = await getPublicProducts();
+  const [products, user] = await Promise.all([
+    getPublicProducts(),
+    getCurrentUser()
+  ])
+
+  const productsWithUserAccess = await Promise.all(products.map(async (p) => {
+    const hasPurchased = await userOwnsProduct(user.user.id, p.id)
+    return {
+      ...p,
+      hasPurchased
+    }
+  }))
+    
+
   return (
     <section className="w-full space-y-8 pb-16">
       <div className="space-y-5">
@@ -49,7 +64,7 @@ async function page() {
 
         {products.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            {products.map((product) => (
+            {productsWithUserAccess.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
