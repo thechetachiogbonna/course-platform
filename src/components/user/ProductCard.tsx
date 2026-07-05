@@ -2,7 +2,7 @@ import Link from "next/link";
 import Price from "./Price";
 
 interface ProductCardProps {
-  product: Product;
+  product: Product & { total_students: number };
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
@@ -31,12 +31,9 @@ export default function ProductCard({ product }: ProductCardProps) {
         <div>
           <div className="flex items-center gap-1.5 mb-1 bg-white/5 w-fit px-2 py-0.5 rounded-full border border-white/5">
             <span className="text-[10px] text-on-surface-variant">
-              {/* (
-              {product.studentsCount >= 1000
-                ? `${(product.studentsCount / 1000).toFixed(1)}k`
-                : product.studentsCount}{" "}
-              students) */}
-              2k
+              {product.total_students >= 1000
+                ? `${(product.total_students / 1000).toFixed(1)}k students`
+                : `${product.total_students} students`}
             </span>
           </div>
 

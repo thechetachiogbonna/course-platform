@@ -4,7 +4,15 @@ import { BookOpen, Search } from "lucide-react";
 
 const getPublicProducts = async () => {
   const result = await db.query(`
-    SELECT * FROM products WHERE status = 'public' ORDER BY created_at DESC
+    SELECT 
+      p.*,
+      COUNT(pch.id) as total_students
+    FROM products as p
+    LEFT JOIN purchases AS pch
+      ON pch.product_id = p.id
+    WHERE p.status = 'public' 
+    GROUP BY p.id
+    ORDER BY total_students DESC
   `);
 
   return result.rows.map((row) => ({

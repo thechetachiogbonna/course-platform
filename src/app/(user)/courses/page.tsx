@@ -1,4 +1,7 @@
 import MyCoursesList, { UserCourse } from "@/components/user/MyCoursesList";
+import { db } from "@/database/db";
+import { getCurrentUser } from "@/features/users/action";
+import { auth } from "@clerk/nextjs/server";
 
 const mockCourses: UserCourse[] = [
   {
@@ -43,7 +46,36 @@ const mockCourses: UserCourse[] = [
   },
 ];
 
-export default function CoursesPage() {
+const getMyCourses = async (userId: string) => {
+  const result = await db.query(
+    `
+      SELECT 
+        *
+      FROM user_course_access AS uca
+      INNER JOIN courses c
+        ON uca.course_id = c.id
+      INNER JOIN sections s
+        ON s.course_id = c.id
+      INNER JOIN lessons l
+        ON l.section_id = s.id
+      LEFT JOIN user_lesson_progress ulp
+        ON ulp.lesson_id = l.id
+      AND ulp.user_id = uca.user_id
+      WHERE uca.user_id = $1;
+    `,
+    [userId]
+  )
+
+  return result.rows
+}
+
+export default async function CoursesPage() {
+  const { user } = await getCurrentUser();
+  if (!user) {
+    return <div>You must be logged in to view your courses</div>
+  }
+  const courses = await getMyCourses(user.id);
+  console.log(courses)
   return (
     <div className="w-full relative min-h-screen">
       <MyCoursesList courses={mockCourses} />
