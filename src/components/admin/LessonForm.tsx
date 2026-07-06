@@ -195,7 +195,7 @@ export default function LessonForm({
               />
 
               {youtubeVideoId && (
-                <YouTubeVideoPlayer videoId={youtubeVideoId} />
+                <YouTubeVideoPlayer action={false} videoId={youtubeVideoId} />
               )}
 
               <FormField

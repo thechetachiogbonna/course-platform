@@ -1,14 +1,15 @@
 import YouTubeVideoPlayer from "@/components/admin/YoutubeVideoPlayer";
 import LessonPlayerSidebar from "@/components/user/LessonPlayerSidebar";
 import { db } from "@/database/db";
+import { getCurrentUser } from "@/features/users/action";
 import { Menu } from "lucide-react";
 import { notFound } from "next/navigation";
 
 interface CourseDetails extends Course {
-  sections: (Section & { lessons: Lesson[] })[];
+  sections: (Section & { lessons: (Lesson & { progressInSeconds: number | null})[] })[];
 }
 
-const getCourseSectionsLessons = async (courseId: string) => {
+const getCourseSectionsLessons = async (courseId: string, userId: string) => {
   const result = await db.query(
     `
       SELECT
@@ -26,16 +27,20 @@ const getCourseSectionsLessons = async (courseId: string) => {
         l.description AS lesson_description,
         l.status AS lesson_status,
         l.order AS lesson_order,
-        l.youtube_video_id AS lesson_youtube_video_id
+        l.youtube_video_id AS lesson_youtube_video_id,
+
+        ulp.progress_seconds AS progress_seconds
       FROM courses c
       JOIN sections s
         ON c.id = s.course_id
       JOIN lessons l
         ON s.id = l.section_id
+      LEFT JOIN user_lesson_progress AS ulp
+        ON l.id = ulp.lesson_id AND ulp.user_id = $2
       WHERE c.id = $1 AND s.status = 'public' AND l.status IN ('preview', 'public')
       ORDER BY s.order ASC, l.order ASC
     `,
-    [courseId],
+    [courseId, userId],
   );
 
   const firstRow = result.rows[0];
@@ -73,6 +78,7 @@ const getCourseSectionsLessons = async (courseId: string) => {
         youtubeVideoId: row.lesson_youtube_video_id,
         status: row.lesson_status,
         order: row.lesson_order,
+        progressInSeconds: row.progress_seconds,
       });
     }
   }
@@ -86,8 +92,9 @@ export default async function LessonPage({
   params: Promise<{ lessonId: string, courseId: string }>;
 }) {
   const { lessonId, courseId } = await params;
-  const course = await getCourseSectionsLessons(courseId);
-
+  const user = await getCurrentUser();
+  const course = await getCourseSectionsLessons(courseId, user.user?.id);
+  
   if (!course) notFound();
 
   const activeLesson = course.sections
@@ -107,6 +114,8 @@ export default async function LessonPage({
       </div>
     );
   }
+
+  console.log(activeLesson)
 
   return (
     <div className="-mx-4 -my-6 flex flex-row min-h-screen w-[calc(100%+2rem)] bg-background-dark text-[#e5e2e1] overflow-hidden">
@@ -142,7 +151,13 @@ export default async function LessonPage({
         <div className="p-6 md:p-8 flex-1 flex flex-col gap-8 pb-32 w-full max-w-4xl mx-auto">
           {/* Video Container */}
           <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-black electric-glow-large border border-white/5 group shadow-2xl">
-            <YouTubeVideoPlayer videoId={activeLesson?.youtubeVideoId} />
+            <YouTubeVideoPlayer 
+              action={true} 
+              userId={user.user.id} 
+              lessonId={activeLesson.id} 
+              videoId={activeLesson?.youtubeVideoId} 
+              stoppedAt={activeLesson?.progressInSeconds || 0}
+            />
           </div>
 
           {/* Info Section with Tabs */}

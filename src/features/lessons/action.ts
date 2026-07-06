@@ -141,3 +141,68 @@ export const updateLessonOrder = async (lessonIds: string[]) => {
     };
   }
 };
+
+export const updateLessonProgress = async (
+  userId: string,
+  lessonId: string,
+  currentTime: number,
+  watchedSeconds: number
+) => {
+  console.log("Saving progress:", currentTime);
+  console.log("Saving seconds:", watchedSeconds);
+  const client = await db.connect();
+
+  try {
+    await client.query("BEGIN");
+
+    await client.query(
+      `
+      INSERT INTO user_lesson_progress (
+        user_id,
+        lesson_id,
+        progress_seconds
+      )
+      VALUES ($1, $2, $3)
+      ON CONFLICT (user_id, lesson_id)
+      DO UPDATE
+      SET
+        progress_seconds = GREATEST(
+          user_lesson_progress.progress_seconds,
+          EXCLUDED.progress_seconds
+        ),
+        updated_at = NOW()
+      `,
+      [userId, lessonId, currentTime]
+    );
+
+    await client.query(
+      `
+      INSERT INTO user_daily_activity (
+        user_id,
+        activity_date,
+        seconds_watched
+      )
+      VALUES (
+        $1,
+        CURRENT_DATE,
+        $2
+      )
+      ON CONFLICT (user_id, activity_date)
+      DO UPDATE
+      SET
+        seconds_watched =
+          user_daily_activity.seconds_watched +
+          EXCLUDED.seconds_watched,
+        updated_at = NOW()
+      `,
+      [userId, watchedSeconds]
+    );
+
+    await client.query("COMMIT");
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
+};

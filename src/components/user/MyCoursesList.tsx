@@ -14,7 +14,6 @@ export interface UserCourse {
   totalLessons: number;
   completedLessons: number;
   progressPercent: number;
-  category?: string;
 }
 
 type Filter = "all" | "in-progress" | "completed";
@@ -24,9 +23,8 @@ function ProgressBar({ percent }: { percent: number }) {
   return (
     <div className="w-full h-1.5 bg-[#353534] rounded-full overflow-hidden">
       <div
-        className={`h-full rounded-full transition-all duration-500 ${
-          isComplete ? "bg-green-500" : "bg-[#e2ec00]"
-        }`}
+        className={`h-full rounded-full transition-all duration-500 ${isComplete ? "bg-green-500" : "bg-[#e2ec00]"
+          }`}
         style={{ width: `${Math.min(percent, 100)}%` }}
       />
     </div>
@@ -57,13 +55,6 @@ function CourseCard({ course }: { course: UserCourse }) {
         )}
         {/* Gradient */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-        
-        {/* Category tag */}
-        {course.category && (
-          <div className="absolute top-4 right-4 px-2 py-1 bg-[#0e0e0e]/80 backdrop-blur-md rounded text-[10px] font-bold text-[#e2ec00] border border-[#474832]/30 uppercase tracking-wider">
-            {course.category}
-          </div>
-        )}
       </div>
 
       {/* Content */}
@@ -77,7 +68,7 @@ function CourseCard({ course }: { course: UserCourse }) {
             <span className="text-xs font-bold text-green-400 shrink-0">Done</span>
           ) : (
             <span className="text-xs font-bold text-[#e2ec00] shrink-0">
-              {course.progressPercent}%
+              {Math.floor(course.progressPercent)}%
             </span>
           )}
         </div>
