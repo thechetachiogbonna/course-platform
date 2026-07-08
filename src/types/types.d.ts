@@ -45,3 +45,8 @@ interface Lesson {
   status: "public" | "private" | "preview";
   order: number;
 }
+
+type ActivityDay = {
+  date: string; // YYYY-MM-DD
+  secondsWatched: number;
+};

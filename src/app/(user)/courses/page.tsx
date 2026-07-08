@@ -1,6 +1,8 @@
-import MyCoursesList, { UserCourse } from "@/components/user/MyCoursesList";
+import LearningHeatmap from "@/components/user/LearningHeatmap";
+import MyCoursesList from "@/components/user/MyCoursesList";
 import { db } from "@/database/db";
 import { getCurrentUser } from "@/features/users/action";
+import { formatDate } from "@/lib/utils";
 
 const getMyCourses = async (userId: string) => {
   const result = await db.query(
@@ -39,16 +41,45 @@ const getMyCourses = async (userId: string) => {
   }))
 }
 
+const getUserDailyActivity = async (userId: string) => {
+  const result = await db.query(
+    `
+      SELECT 
+        activity_date,
+        seconds_watched
+      FROM user_daily_activity 
+      WHERE user_id = $1
+    `, [userId])
+
+  return result.rows.map((row) => ({
+    date: formatDate(new Date(row.activity_date)),
+    secondsWatched: row.seconds_watched,
+  })) as ActivityDay[]
+}
+
 export default async function CoursesPage() {
   const { user } = await getCurrentUser();
-  if (!user) {
-    return <div>You must be logged in to view your courses</div>
-  }
-  const courses = await getMyCourses(user.id);
-  console.log(courses)
+  
+  const [coursesResult, activityResult] = await Promise.allSettled([
+    getMyCourses(user.id),
+    getUserDailyActivity(user.id),
+  ]);
+
+  const courses =
+    coursesResult.status === "fulfilled"
+      ? coursesResult.value
+      : [];
+
+  const activity =
+    activityResult.status === "fulfilled"
+      ? activityResult.value
+      : [];
+    
   return (
     <div className="w-full relative min-h-screen">
       <MyCoursesList courses={courses} />
+
+      <LearningHeatmap activity={activity} currentStreak={7} />
     </div>
   );
 }

@@ -46,9 +46,15 @@ function YouTubeVideoPlayerWithProgress({
   const saveProgress = async () => {
     const player = playerRef.current;
     if (!player) return;
-    if (isSeeking.current) return;
 
     const currentTime = Math.floor(player.getCurrentTime());
+
+    if (isSeeking.current) {
+      lastPosition.current = currentTime;
+      isSeeking.current = false;
+      return;
+    }
+
     const watchedSeconds = currentTime - lastPosition.current;
 
     await updateLessonProgress(userId, lessonId, currentTime, watchedSeconds);
@@ -60,7 +66,6 @@ function YouTubeVideoPlayerWithProgress({
   saveProgressRef.current = saveProgress;
 
   useEffect(() => {
-    console.log(lastPosition.current)
     const handleVisibilityChange = () => {
       if (document.hidden) {
         if (lastPosition.current > 0) {
@@ -106,11 +111,8 @@ function YouTubeVideoPlayerWithProgress({
     }
 
     if (event.data === 3) {
+      console.log("Bluffering...")
       isSeeking.current = true;
-    }
-
-    if (event.data === 1) {
-      isSeeking.current = false;
     }
   };
 
