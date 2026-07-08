@@ -27,8 +27,8 @@ const getMyCourses = async (userId: string) => {
       WHERE uca.user_id = $1
       GROUP BY c.id;
     `,
-    [userId]
-  )
+    [userId],
+  );
 
   return result.rows.map((row) => ({
     courseId: row.course_id,
@@ -38,8 +38,8 @@ const getMyCourses = async (userId: string) => {
     completedLessons: row.completed_lessons,
     progressPercent: row.progress_percent,
     courseImageUrl: row.course_image_url,
-  }))
-}
+  }));
+};
 
 const getUserDailyActivity = async (userId: string) => {
   const result = await db.query(
@@ -49,37 +49,60 @@ const getUserDailyActivity = async (userId: string) => {
         seconds_watched
       FROM user_daily_activity 
       WHERE user_id = $1
-    `, [userId])
+    `,
+    [userId],
+  );
 
   return result.rows.map((row) => ({
     date: formatDate(new Date(row.activity_date)),
     secondsWatched: row.seconds_watched,
-  })) as ActivityDay[]
+  })) as ActivityDay[];
+};
+
+const getCurrentStreak = (dates: string[]) => {
+  const activeDays = new Set(dates);
+
+  let streak = 0;
+
+  let current = new Date();
+
+  while (true) {
+    current.setDate(current.getDate() - 1);
+
+    const key = formatDate(current);
+
+    if (!activeDays.has(key)) {
+      break;
+    }
+
+    streak++;
+  }
+
+  return streak;
 }
 
 export default async function CoursesPage() {
   const { user } = await getCurrentUser();
-  
+
   const [coursesResult, activityResult] = await Promise.allSettled([
     getMyCourses(user.id),
     getUserDailyActivity(user.id),
   ]);
 
   const courses =
-    coursesResult.status === "fulfilled"
-      ? coursesResult.value
-      : [];
+    coursesResult.status === "fulfilled" ? coursesResult.value : [];
 
   const activity =
-    activityResult.status === "fulfilled"
-      ? activityResult.value
-      : [];
-    
+    activityResult.status === "fulfilled" ? activityResult.value : [];
+
   return (
     <div className="w-full relative min-h-screen">
       <MyCoursesList courses={courses} />
 
-      <LearningHeatmap activity={activity} currentStreak={7} />
+      <LearningHeatmap
+        activity={activity}
+        currentStreak={getCurrentStreak(activity.map((day) => day.date))}
+      />
     </div>
   );
 }
