@@ -116,8 +116,6 @@ export default async function CourseDetailPage({
   const course = await getCourse(courseId);
   if (!course) notFound();
 
-  console.log(course.sections)
-
   const totalLessons = course.sections?.reduce(
     (acc, section) => acc + section.lessons.length,
     0,

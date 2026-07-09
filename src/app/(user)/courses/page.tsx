@@ -2,7 +2,7 @@ import LearningHeatmap from "@/components/user/LearningHeatmap";
 import MyCoursesList from "@/components/user/MyCoursesList";
 import { db } from "@/database/db";
 import { getCurrentUser } from "@/features/users/action";
-import { formatDate } from "@/lib/utils";
+import { formatDate, getCurrentStreak } from "@/lib/utils";
 
 const getMyCourses = async (userId: string) => {
   const result = await db.query(
@@ -58,29 +58,6 @@ const getUserDailyActivity = async (userId: string) => {
     secondsWatched: row.seconds_watched,
   })) as ActivityDay[];
 };
-
-const getCurrentStreak = (dates: string[]) => {
-  const activeDays = new Set(dates);
-
-  console.log(activeDays)
-
-  let streak = 0;
-
-  let current = new Date();
-
-  while (true) {
-    const key = formatDate(current);
-    
-    if (!activeDays.has(key)) {
-      break;
-    }
-    
-    streak++;
-    current.setDate(current.getDate() - 1);
-  }
-
-  return streak;
-}
 
 export default async function CoursesPage() {
   const { user } = await getCurrentUser();

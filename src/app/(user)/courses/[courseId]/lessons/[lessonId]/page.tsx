@@ -2,6 +2,7 @@ import YouTubeVideoPlayer from "@/components/admin/YoutubeVideoPlayer";
 import LessonPlayerSidebar from "@/components/user/LessonPlayerSidebar";
 import { db } from "@/database/db";
 import { getCurrentUser } from "@/features/users/action";
+import { formatDate, getCurrentStreak } from "@/lib/utils";
 import { Menu } from "lucide-react";
 import { notFound } from "next/navigation";
 
@@ -86,14 +87,37 @@ const getCourseSectionsLessons = async (courseId: string, userId: string) => {
   return course;
 };
 
+const getUserStreak = async (userId: string) => {
+  const result = await db.query(
+    `
+      SELECT 
+        activity_date,
+        seconds_watched
+      FROM user_daily_activity 
+      WHERE user_id = $1
+    `,
+    [userId],
+  );
+
+  const activity = result.rows.map((row) => ({
+    date: formatDate(new Date(row.activity_date)),
+    secondsWatched: row.seconds_watched,
+  })) as ActivityDay[];
+
+  return getCurrentStreak(activity.map(day => day.date))
+};
+
 export default async function LessonPage({
   params,
 }: {
   params: Promise<{ lessonId: string, courseId: string }>;
 }) {
   const { lessonId, courseId } = await params;
-  const user = await getCurrentUser();
-  const course = await getCourseSectionsLessons(courseId, user.user?.id);
+  const user = await getCurrentUser()
+  const [course, streak] = await Promise.all([
+    getCourseSectionsLessons(courseId, user.user.id),
+    getUserStreak(user.user.id)
+  ])
   
   if (!course) notFound();
 
@@ -114,8 +138,6 @@ export default async function LessonPage({
       </div>
     );
   }
-
-  console.log(activeLesson)
 
   return (
     <div className="-mx-4 -my-6 flex flex-row min-h-screen w-[calc(100%+2rem)] bg-background-dark text-[#e5e2e1] overflow-hidden">
@@ -143,7 +165,7 @@ export default async function LessonPage({
 
           <div className="hidden md:flex px-4 py-1.5 bg-[#1c1b1b] rounded-full border border-[#252524]">
             <span className="text-[11px] font-bold text-brand-yellow uppercase tracking-widest">
-              Streak: 14 Days 🔥
+              Streak: {streak} Days 🔥
             </span>
           </div>
         </header>

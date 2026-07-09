@@ -34,3 +34,24 @@ export const formatDate = (date: Date) => {
 
   return `${year}-${month}-${day}`;
 }
+
+export const getCurrentStreak = (dates: string[]) => {
+  const activeDays = new Set(dates);
+
+  let streak = 0;
+
+  let current = new Date();
+
+  while (true) {
+    const key = formatDate(current);
+    
+    if (!activeDays.has(key)) {
+      break;
+    }
+    
+    streak++;
+    current.setDate(current.getDate() - 1);
+  }
+
+  return streak;
+}
