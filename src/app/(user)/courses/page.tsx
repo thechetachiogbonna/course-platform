@@ -62,20 +62,21 @@ const getUserDailyActivity = async (userId: string) => {
 const getCurrentStreak = (dates: string[]) => {
   const activeDays = new Set(dates);
 
+  console.log(activeDays)
+
   let streak = 0;
 
   let current = new Date();
 
   while (true) {
-    current.setDate(current.getDate() - 1);
-
     const key = formatDate(current);
-
+    
     if (!activeDays.has(key)) {
       break;
     }
-
+    
     streak++;
+    current.setDate(current.getDate() - 1);
   }
 
   return streak;
