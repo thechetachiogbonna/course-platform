@@ -3,7 +3,6 @@
 import { updateLessonProgress } from "@/features/lessons/action";
 import { useEffect, useRef } from "react";
 import YouTube, { YouTubeEvent } from "react-youtube";
-import { Button } from "../ui/button";
 
 type Prop1 = {
   action: true;
@@ -40,11 +39,11 @@ function YouTubeVideoPlayerWithProgress({
   userId,
   lessonId,
   stoppedAt,
-  completed
-}: Prop1) {
+  completed: initialCompleted
+}: Prop1) {  
   const playerRef = useRef<YouTubeEvent["target"]>(null);
   const lastPosition = useRef(0);
-  const isSeeking = useRef(false);
+  const completed = useRef(initialCompleted);
 
   const saveProgress = async () => {
     const player = playerRef.current;
@@ -54,15 +53,9 @@ function YouTubeVideoPlayerWithProgress({
 
     if (lastPosition.current === currentTime) return;
 
-    if (isSeeking.current) {
-      lastPosition.current = currentTime;
-      isSeeking.current = false;
-      return;
-    }
-
     const watchedSeconds = currentTime - lastPosition.current;
 
-    await updateLessonProgress(userId, lessonId, currentTime, watchedSeconds, completed);
+    await updateLessonProgress(userId, lessonId, currentTime, watchedSeconds, completed.current);
     lastPosition.current = currentTime;
   };
 
@@ -73,12 +66,6 @@ function YouTubeVideoPlayerWithProgress({
     const currentTime = Math.floor(player.getCurrentTime());
 
     if (lastPosition.current === currentTime) return;
-
-    if (isSeeking.current) {
-      lastPosition.current = currentTime;
-      isSeeking.current = false;
-      return;
-    }
 
     const watchedSeconds = currentTime - lastPosition.current;
 
@@ -125,6 +112,7 @@ function YouTubeVideoPlayerWithProgress({
   const markLessonAsComplete = async (currentTime: number) => {
     await updateLessonProgress(userId, lessonId, currentTime, 0, true);
     lastPosition.current = 0;
+    completed.current = true;
   };
 
   const onReady = (event: YouTubeEvent) => {
@@ -143,11 +131,6 @@ function YouTubeVideoPlayerWithProgress({
     // if user pauses the video
     if (event.data === 2) {
       saveProgress();
-    }
-    
-    // if user seeks the video
-    if (event.data === 3) {
-      isSeeking.current = true;
     }
 
     // if user completes the video
