@@ -76,7 +76,7 @@ function YouTubeVideoPlayerWithProgress({
         lessonId,
         currentTime,
         watchedSeconds,
-        completed
+        completed: completed.current
       })
     );
   };
