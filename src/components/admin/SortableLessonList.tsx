@@ -45,7 +45,7 @@ export default function SortableLessonList({
                   "w-full p-4 flex items-start gap-3 hover:bg-white/5 transition-colors",
                 )}
               >
-                <div className="p-2 rounded-lg bg-[#e2ec00]/10 text-[#e2ec00] shrink-0 mt-0.5">
+                <div className="p-2 rounded-lg bg-brand-yellow/10 text-brand-yellow shrink-0 mt-0.5">
                   <PlaySquare className="w-4 h-4" />
                 </div>
 
@@ -66,7 +66,7 @@ export default function SortableLessonList({
                         Order: {lesson.order}
                       </span>
 
-                      <span className="text-[8px] bg-white/5 px-1.5 py-0.5 rounded font-bold uppercase text-[#e2ec00]">
+                      <span className="text-[8px] bg-white/5 px-1.5 py-0.5 rounded font-bold uppercase text-brand-yellow">
                         {lesson.status}
                       </span>
 
@@ -79,7 +79,7 @@ export default function SortableLessonList({
                           sections={sections}
                         >
                           <button
-                            className="p-1.5 rounded-lg hover:bg-white/10 text-[#c9c8ab]/60 hover:text-[#e2ec00] transition-colors cursor-pointer"
+                            className="p-1.5 rounded-lg hover:bg-white/10 text-[#c9c8ab]/60 hover:text-brand-yellow transition-colors cursor-pointer"
                             title="Edit Lesson"
                           >
                             <Edit className="w-3.5 h-3.5" />

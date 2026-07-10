@@ -219,7 +219,7 @@ export default async function ProductDetailPage({
                       <div className="flex items-center gap-2">
                         <Link
                           href={`/courses/${course.id}`}
-                          className="text-brand-yellow text-xs font-bold py-2 px-4 rounded-xl hover:bg-[#e2ec00]/10 transition-all flex items-center gap-1 uppercase tracking-wider cursor-pointer">
+                          className="text-brand-yellow text-xs font-bold py-2 px-4 rounded-xl hover:bg-brand-yellow/10 transition-all flex items-center gap-1 uppercase tracking-wider cursor-pointer">
                           <PlayCircle className="w-3.5 h-3.5" />
                           <span>View Course</span>
                         </Link>

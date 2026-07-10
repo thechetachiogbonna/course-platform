@@ -114,7 +114,7 @@ export default function SectionForm({
             </DialogTitle>
 
             <div className="flex items-center gap-3 rounded-2xl border border-[#252525] bg-[#1c1b1b] p-4">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-[#e2ec00]/20 bg-[#e2ec00]/10 text-[#e2ec00]">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-brand-yellow/20 bg-brand-yellow/10 text-brand-yellow">
                 <Book />
               </div>
               <div>
@@ -133,7 +133,7 @@ export default function SectionForm({
               onSubmit={form.handleSubmit(handleSubmit)}
               className="relative space-y-6 overflow-hidden rounded-2xl border border-[#252525] bg-[#1a1a1a]/80 p-6 shadow-xl backdrop-blur-md"
             >
-              <div className="absolute top-0 left-0 h-0.5 w-full bg-linear-to-r from-transparent via-[#e2ec00] to-transparent opacity-40" />
+              <div className="absolute top-0 left-0 h-0.5 w-full bg-linear-to-r from-transparent via-brand-yellow to-transparent opacity-40" />
 
               <FormField
                 control={form.control}
@@ -193,7 +193,7 @@ export default function SectionForm({
                 <Button
                   type="submit"
                   disabled={form.formState.isSubmitting}
-                  className="flex h-auto flex-1 items-center justify-center gap-1.5 rounded-xl bg-[#e2ec00] py-3.5 text-xs font-bold tracking-wider text-[#1c1d00] uppercase shadow-[0_4px_12px_rgba(226,236,0,0.15)] hover:brightness-110 active:scale-95"
+                  className="flex h-auto flex-1 items-center justify-center gap-1.5 rounded-xl bg-brand-yellow py-3.5 text-xs font-bold tracking-wider text-[#1c1d00] uppercase shadow-[0_4px_12px_rgba(226,236,0,0.15)] hover:brightness-110 active:scale-95"
                 >
                   {form.formState.isSubmitting ? (
                     type === "create" ? "Creating..." : "Saving..."

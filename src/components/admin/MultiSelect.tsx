@@ -108,7 +108,7 @@ export default function MultiSelect({
                         </p>
                       </div>
                       {isSelected && (
-                        <Check className="h-4 w-4 shrink-0 text-[#e2ec00]" />
+                        <Check className="h-4 w-4 shrink-0 text-brand-yellow" />
                       )}
                     </Button>
                   );

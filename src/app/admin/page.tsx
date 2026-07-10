@@ -85,7 +85,7 @@ export default async function ProductsPage() {
       {/* Stats Bento Grid Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1: Total SKUs */}
-        <div className="bg-[#1a1a1a]/80 backdrop-blur-md border border-[#252525] p-5 rounded-2xl flex flex-col justify-between h-32 relative overflow-hidden group hover:border-[#e2ec00]/30 transition-all">
+        <div className="bg-[#1a1a1a]/80 backdrop-blur-md border border-[#252525] p-5 rounded-2xl flex flex-col justify-between h-32 relative overflow-hidden group hover:border-brand-yellow/30 transition-all">
           <div className="absolute -right-4 -top-4 opacity-5 group-hover:opacity-10 transition-opacity text-white">
             <Layers className="w-24 h-24" />
           </div>
@@ -96,17 +96,17 @@ export default async function ProductsPage() {
         </div>
 
         {/* Card 2: Public Listings */}
-        <div className="bg-[#1a1a1a]/80 backdrop-blur-md border border-[#252525] p-5 rounded-2xl flex flex-col justify-between h-32 relative group hover:border-[#e2ec00]/30 transition-all">
+        <div className="bg-[#1a1a1a]/80 backdrop-blur-md border border-[#252525] p-5 rounded-2xl flex flex-col justify-between h-32 relative group hover:border-brand-yellow/30 transition-all">
           <span className="text-xs font-bold text-[#c9c8ab] uppercase tracking-wider">
             Public Listings
           </span>
-          <p className="text-4xl font-extrabold text-[#e2ec00]">
+          <p className="text-4xl font-extrabold text-brand-yellow">
             {40}
           </p>
         </div>
 
         {/* Card 3: Inventory Value */}
-        <div className="bg-[#1a1a1a]/80 backdrop-blur-md border border-[#252525] p-5 rounded-2xl flex flex-col justify-between h-32 relative group hover:border-[#e2ec00]/30 transition-all">
+        <div className="bg-[#1a1a1a]/80 backdrop-blur-md border border-[#252525] p-5 rounded-2xl flex flex-col justify-between h-32 relative group hover:border-brand-yellow/30 transition-all">
           <span className="text-xs font-bold text-[#c9c8ab] uppercase tracking-wider">
             Inventory Value
           </span>
@@ -125,7 +125,7 @@ export default async function ProductsPage() {
             placeholder="Search product name or description..."
             // value={searchQuery}
             // onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[#1a1a1a] border border-[#252525] rounded-xl pl-12 pr-4 py-3 text-sm text-white placeholder-[#c9c8ab]/40 focus:outline-none focus:border-[#e2ec00] transition-all"
+            className="w-full bg-[#1a1a1a] border border-[#252525] rounded-xl pl-12 pr-4 py-3 text-sm text-white placeholder-[#c9c8ab]/40 focus:outline-none focus:border-brand-yellow transition-all"
           />
         </div>
 
@@ -146,7 +146,7 @@ export default async function ProductsPage() {
               onClick={() => setFilterStatus("Public")}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                 filterStatus === "Public"
-                  ? "bg-[#e2ec00] text-[#1c1d00]"
+                  ? "bg-brand-yellow text-[#1c1d00]"
                   : "text-[#c9c8ab] hover:text-white"
               }`}
             >
@@ -166,7 +166,7 @@ export default async function ProductsPage() {
 
           <Link
             href="/admin/products/new"
-            className="bg-[#e2ec00] text-[#1c1d00] hover:brightness-110 active:scale-95 transition-all px-5 py-3 rounded-xl font-bold text-xs tracking-wider flex items-center gap-1 shadow-[0_4px_12px_rgba(226,236,0,0.15)] uppercase"
+            className="bg-brand-yellow text-[#1c1d00] hover:brightness-110 active:scale-95 transition-all px-5 py-3 rounded-xl font-bold text-xs tracking-wider flex items-center gap-1 shadow-[0_4px_12px_rgba(226,236,0,0.15)] uppercase"
           >
             <Plus className="w-4 h-4" />
             New Product
@@ -193,7 +193,7 @@ export default async function ProductsPage() {
               <div
                 key={p.id}
                 id={`product-card-${p.id}`}
-                className="bg-[#1a1a1a]/80 backdrop-blur-md border border-[#252525] rounded-2xl overflow-hidden flex flex-col hover:border-[#e2ec00]/40 group transition-all duration-300"
+                className="bg-[#1a1a1a]/80 backdrop-blur-md border border-[#252525] rounded-2xl overflow-hidden flex flex-col hover:border-brand-yellow/40 group transition-all duration-300"
               >
                 {/* Cover Image Container */}
                 <div className="h-48 w-full overflow-hidden relative bg-[#2a2a2a]">
@@ -207,7 +207,7 @@ export default async function ProductsPage() {
                   {/* Status Badge */}
                   <div className="absolute top-3 right-3 bg-[#131313]/90 backdrop-blur-md px-3 py-1 rounded-full flex items-center gap-1.5 border border-white/10">
                     <span
-                      className={`w-2 h-2 rounded-full ${isPublic ? "bg-[#e2ec00] shadow-[0_0_8px_rgba(226,236,0,0.8)]" : "bg-[#c9c8ab]/40"}`}
+                      className={`w-2 h-2 rounded-full ${isPublic ? "bg-brand-yellow shadow-[0_0_8px_rgba(226,236,0,0.8)]" : "bg-[#c9c8ab]/40"}`}
                     />
                     <span className="text-[10px] font-bold text-white uppercase tracking-wider">
                       {p.status}
@@ -218,10 +218,10 @@ export default async function ProductsPage() {
                 {/* Info Block */}
                 <div className="p-4 flex flex-col flex-1">
                   <div className="flex justify-between items-start gap-2 mb-2">
-                    <h3 className="font-bold text-base text-white tracking-tight line-clamp-1 group-hover:text-[#e2ec00] transition-colors">
+                    <h3 className="font-bold text-base text-white tracking-tight line-clamp-1 group-hover:text-brand-yellow transition-colors">
                       {p.name}
                     </h3>
-                    <span className="text-sm font-extrabold text-[#e2ec00] whitespace-nowrap">
+                    <span className="text-sm font-extrabold text-brand-yellow whitespace-nowrap">
                       $
                       {p.price.toLocaleString("en-US", {
                         minimumFractionDigits: 2,

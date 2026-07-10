@@ -135,7 +135,7 @@ export default function ProductForm({
         <div className="flex items-center gap-1.5 text-xs font-semibold text-[#c9c8ab]">
           <span>Products</span>
           <ChevronRight className="h-3.5 w-3.5 text-white/40" />
-          <span className="font-mono font-medium text-[#e2ec00]">
+          <span className="font-mono font-medium text-brand-yellow">
             {type === "create" ? "New Product" : "Edit Product"}
           </span>
         </div>
@@ -152,7 +152,7 @@ export default function ProductForm({
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
           <div className="space-y-5 rounded-2xl border border-[#252525] bg-[#1a1a1a]/80 p-6 backdrop-blur-md">
             <div className="flex items-center gap-2 border-b border-[#252525]/50 pb-3">
-              <FileText className="h-5 w-5 text-[#e2ec00]" />
+              <FileText className="h-5 w-5 text-brand-yellow" />
               <h3 className="text-base font-bold tracking-tight text-white">
                 Product Details
               </h3>
@@ -271,7 +271,7 @@ export default function ProductForm({
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div className="space-y-4 rounded-2xl border border-[#252525] bg-[#1a1a1a]/80 p-6 backdrop-blur-md">
               <div className="flex items-center gap-2 border-b border-[#252525]/50 pb-2">
-                <span className="shrink-0 rounded bg-[#e2ec00]/10 p-1 text-[#e2ec00]">
+                <span className="shrink-0 rounded bg-brand-yellow/10 p-1 text-brand-yellow">
                   <DollarSign className="h-4 w-4" />
                 </span>
                 <h3 className="text-sm font-bold tracking-wider text-white uppercase">
@@ -289,7 +289,7 @@ export default function ProductForm({
                     </FormLabel>
                     <FormControl>
                       <div className="relative">
-                        <span className="absolute top-1/2 left-4 -translate-y-1/2 font-mono font-bold text-[#e2ec00]">
+                        <span className="absolute top-1/2 left-4 -translate-y-1/2 font-mono font-bold text-brand-yellow">
                           $
                         </span>
                         <Input
@@ -316,7 +316,7 @@ export default function ProductForm({
 
             <div className="space-y-4 rounded-2xl border border-[#252525] bg-[#1a1a1a]/80 p-6 backdrop-blur-md">
               <div className="flex items-center gap-2 border-b border-[#252525]/50 pb-2">
-                <span className="shrink-0 rounded bg-[#e2ec00]/10 p-1 text-[#e2ec00]">
+                <span className="shrink-0 rounded bg-brand-yellow/10 p-1 text-brand-yellow">
                   <Eye className="h-4 w-4" />
                 </span>
                 <h3 className="text-sm font-bold tracking-wider text-white uppercase">
@@ -361,7 +361,7 @@ export default function ProductForm({
             <Button
               type="submit"
               disabled={form.formState.isSubmitting || haveNotBeenEditted}
-              className="h-auto w-full rounded-xl bg-[#e2ec00] px-8 py-4 text-xs font-bold tracking-wider text-[#1c1d00] uppercase shadow-[0_4px_16px_rgba(226,236,0,0.25)] hover:brightness-110 active:scale-95 sm:w-auto"
+              className="h-auto w-full rounded-xl bg-brand-yellow px-8 py-4 text-xs font-bold tracking-wider text-[#1c1d00] uppercase shadow-[0_4px_16px_rgba(226,236,0,0.25)] hover:brightness-110 active:scale-95 sm:w-auto"
             >
               {form.formState.isSubmitting
                 ? "Saving..."

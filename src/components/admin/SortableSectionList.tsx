@@ -97,7 +97,7 @@ export default function SortableSectionList({
                               section={section}
                             >
                               <button
-                                className="p-1.5 rounded-lg hover:bg-white/10 text-[#c9c8ab]/60 hover:text-[#e2ec00] transition-colors cursor-pointer"
+                                className="p-1.5 rounded-lg hover:bg-white/10 text-[#c9c8ab]/60 hover:text-brand-yellow transition-colors cursor-pointer"
                                 title="Edit Section"
                               >
                                 <Edit className="w-3.5 h-3.5" />
@@ -118,7 +118,7 @@ export default function SortableSectionList({
                               ({ lessons, ...sections }) => sections,
                             )}
                           >
-                            <div className="cursor-pointer text-[#e2ec00] hover:text-white border border-[#e2ec00]/20 hover:border-[#e2ec00] text-[10px] font-bold py-1 px-3 rounded-lg flex items-center gap-1 transition-all">
+                            <div className="cursor-pointer text-brand-yellow hover:text-white border border-brand-yellow/20 hover:border-brand-yellow text-[10px] font-bold py-1 px-3 rounded-lg flex items-center gap-1 transition-all">
                               <Plus className="w-3 h-3" />
                               <span>Add Lesson</span>
                             </div>

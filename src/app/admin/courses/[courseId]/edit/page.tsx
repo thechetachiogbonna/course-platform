@@ -93,9 +93,9 @@ async function EditCoursePage({
       <div className="bg-[#1a1a1a]/80 backdrop-blur-md p-6 rounded-2xl border border-[#252525] shadow-lg space-y-6 w-full mx-auto max-w-5xl">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-[#252525] pb-4 gap-4">
           <div className="flex items-center gap-2">
-            <FolderOpen className="w-5 h-5 text-[#e2ec00]" />
+            <FolderOpen className="w-5 h-5 text-brand-yellow" />
             <div>
-              <span className="text-[9px] text-[#e2ec00] font-bold font-mono tracking-widest block">
+              <span className="text-[9px] text-brand-yellow font-bold font-mono tracking-widest block">
                 CURRICULUM TREE
               </span>
               <h3 className="text-base font-bold text-white tracking-tight">
@@ -110,7 +110,7 @@ async function EditCoursePage({
             courseId={courseId}
             nextSectionOrder={course.sections.length + 1}
           >
-            <button className="bg-[#e2ec00]/10 border border-[#e2ec00]/30 text-[#e2ec00] text-xs font-bold py-2 px-4 rounded-xl hover:bg-[#e2ec00]/20 transition-all flex items-center gap-1 uppercase tracking-wider cursor-pointer">
+            <button className="bg-brand-yellow/10 border border-brand-yellow/30 text-brand-yellow text-xs font-bold py-2 px-4 rounded-xl hover:bg-brand-yellow/20 transition-all flex items-center gap-1 uppercase tracking-wider cursor-pointer">
               <Plus className="w-3.5 h-3.5" />
               <span>New Section</span>
             </button>

@@ -23,7 +23,7 @@ function ProgressBar({ percent }: { percent: number }) {
   return (
     <div className="w-full h-1.5 bg-[#353534] rounded-full overflow-hidden">
       <div
-        className={`h-full rounded-full transition-all duration-500 ${isComplete ? "bg-green-500" : "bg-[#e2ec00]"
+        className={`h-full rounded-full transition-all duration-500 ${isComplete ? "bg-green-500" : "bg-brand-yellow"
           }`}
         style={{ width: `${Math.min(percent, 100)}%` }}
       />
@@ -36,7 +36,7 @@ function CourseCard({ course }: { course: UserCourse }) {
   const hasStarted = course.completedLessons > 0;
 
   return (
-    <div className="glass-card rounded-xl overflow-hidden group hover:border-[#e2ec00]/50 transition-all duration-300">
+    <div className="glass-card rounded-xl overflow-hidden group hover:border-brand-yellow/50 transition-all duration-300">
       {/* Thumbnail */}
       <div className="relative h-48 w-full overflow-hidden bg-[#1c1b1b]">
         {course.courseImageUrl ? (
@@ -67,7 +67,7 @@ function CourseCard({ course }: { course: UserCourse }) {
           {isComplete ? (
             <span className="text-xs font-bold text-green-400 shrink-0">Done</span>
           ) : (
-            <span className="text-xs font-bold text-[#e2ec00] shrink-0">
+            <span className="text-xs font-bold text-brand-yellow shrink-0">
               {Math.floor(course.progressPercent)}%
             </span>
           )}
@@ -96,7 +96,7 @@ function CourseCard({ course }: { course: UserCourse }) {
           <Link
             href={`/courses/${course.courseId}`}
             id={`btn-continue-${course.courseId}`}
-            className="mt-2 w-full py-3 bg-[#e2ec00] text-[#1b1d00] font-bold text-xs rounded-lg flex items-center justify-center gap-2 hover:brightness-110 active:scale-95 transition-all"
+            className="mt-2 w-full py-3 bg-brand-yellow text-[#1b1d00] font-bold text-xs rounded-lg flex items-center justify-center gap-2 hover:brightness-110 active:scale-95 transition-all"
           >
             {hasStarted ? "Continue Learning" : "Start Learning"}
             <PlayCircle className="w-4 h-4" />
@@ -162,7 +162,7 @@ export default function MyCoursesList({ courses }: { courses: UserCourse[] }) {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search your purchases..."
-            className="w-full bg-[#1c1b1b] border border-[#474832]/30 rounded-xl py-3.5 pl-11 pr-4 text-sm text-white placeholder:text-[#929277]/50 focus:outline-none focus:border-[#e2ec00] focus:ring-1 focus:ring-[#e2ec00] transition-all"
+            className="w-full bg-[#1c1b1b] border border-[#474832]/30 rounded-xl py-3.5 pl-11 pr-4 text-sm text-white placeholder:text-[#929277]/50 focus:outline-none focus:border-brand-yellow focus:ring-1 focus:ring-brand-yellow transition-all"
           />
         </div>
 
@@ -175,7 +175,7 @@ export default function MyCoursesList({ courses }: { courses: UserCourse[] }) {
               onClick={() => setFilter(f.value)}
               className={`px-4 py-1.5 rounded-full text-xs font-bold whitespace-nowrap active:scale-95 transition-all ${
                 filter === f.value
-                  ? "bg-[#e2ec00] text-[#1b1d00]"
+                  ? "bg-brand-yellow text-[#1b1d00]"
                   : "bg-[#2a2a2a] text-[#929277] border border-[#474832]/30 hover:text-white"
               }`}
             >
