@@ -146,10 +146,9 @@ export const updateLessonProgress = async (
   userId: string,
   lessonId: string,
   currentTime: number,
-  watchedSeconds: number
+  watchedSeconds: number,
+  completed: boolean
 ) => {
-  console.log("Saving progress:", currentTime);
-  console.log("Saving seconds:", watchedSeconds);
   const client = await db.connect();
 
   try {
@@ -160,9 +159,10 @@ export const updateLessonProgress = async (
       INSERT INTO user_lesson_progress (
         user_id,
         lesson_id,
-        progress_seconds
+        progress_seconds,
+        completed
       )
-      VALUES ($1, $2, $3)
+      VALUES ($1, $2, $3, $4)
       ON CONFLICT (user_id, lesson_id)
       DO UPDATE
       SET
@@ -170,9 +170,10 @@ export const updateLessonProgress = async (
           user_lesson_progress.progress_seconds,
           EXCLUDED.progress_seconds
         ),
+        completed = $4,
         updated_at = NOW()
       `,
-      [userId, lessonId, currentTime]
+      [userId, lessonId, currentTime, completed]
     );
 
     await client.query(

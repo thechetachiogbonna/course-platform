@@ -3,10 +3,7 @@ import { NextRequest } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
-    const { userId, lessonId, currentTime, watchedSeconds } = await req.json();
-
-    console.log("Saving progress: from api route ", currentTime);
-    console.log("Saving seconds: from api route ", watchedSeconds);
+    const { userId, lessonId, currentTime, watchedSeconds, completed } = await req.json()
 
     const client = await db.connect();
 
@@ -18,9 +15,10 @@ export async function POST(req: NextRequest) {
           INSERT INTO user_lesson_progress (
             user_id,
             lesson_id,
-            progress_seconds
+            progress_seconds,
+            completed
           )
-          VALUES ($1, $2, $3)
+          VALUES ($1, $2, $3, $4)
           ON CONFLICT (user_id, lesson_id)
           DO UPDATE
           SET
@@ -34,9 +32,10 @@ export async function POST(req: NextRequest) {
                 EXCLUDED.progress_seconds
             )
             END,
+            completed = $4,
             updated_at = NOW()
           `,
-          [userId, lessonId, currentTime]
+          [userId, lessonId, currentTime, completed]
         );
     
         await client.query(

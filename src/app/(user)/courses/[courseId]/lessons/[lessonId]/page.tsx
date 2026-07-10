@@ -7,7 +7,7 @@ import { Menu } from "lucide-react";
 import { notFound } from "next/navigation";
 
 interface CourseDetails extends Course {
-  sections: (Section & { lessons: (Lesson & { progressInSeconds: number | null})[] })[];
+  sections: (Section & { lessons: (Lesson & { progressInSeconds: number | null, completed: boolean | null })[] })[];
 }
 
 const getCourseSectionsLessons = async (courseId: string, userId: string) => {
@@ -29,8 +29,8 @@ const getCourseSectionsLessons = async (courseId: string, userId: string) => {
         l.status AS lesson_status,
         l.order AS lesson_order,
         l.youtube_video_id AS lesson_youtube_video_id,
-
-        ulp.progress_seconds AS progress_seconds
+        ulp.progress_seconds AS progress_seconds,
+        ulp.completed AS completed
       FROM courses c
       JOIN sections s
         ON c.id = s.course_id
@@ -179,6 +179,7 @@ export default async function LessonPage({
               lessonId={activeLesson.id} 
               videoId={activeLesson?.youtubeVideoId} 
               stoppedAt={activeLesson?.progressInSeconds || 0}
+              completed={activeLesson?.completed || false}
             />
           </div>
 

@@ -11,6 +11,7 @@ type Prop1 = {
   userId: string;
   lessonId: string;
   stoppedAt: number;
+  completed: boolean
 };
 
 type Prop2 = {
@@ -39,6 +40,7 @@ function YouTubeVideoPlayerWithProgress({
   userId,
   lessonId,
   stoppedAt,
+  completed
 }: Prop1) {
   const playerRef = useRef<YouTubeEvent["target"]>(null);
   const lastPosition = useRef(0);
@@ -50,6 +52,8 @@ function YouTubeVideoPlayerWithProgress({
 
     const currentTime = Math.floor(player.getCurrentTime());
 
+    if (lastPosition.current === currentTime) return;
+
     if (isSeeking.current) {
       lastPosition.current = currentTime;
       isSeeking.current = false;
@@ -58,7 +62,7 @@ function YouTubeVideoPlayerWithProgress({
 
     const watchedSeconds = currentTime - lastPosition.current;
 
-    await updateLessonProgress(userId, lessonId, currentTime, watchedSeconds);
+    await updateLessonProgress(userId, lessonId, currentTime, watchedSeconds, completed);
     lastPosition.current = currentTime;
   };
 
@@ -67,6 +71,14 @@ function YouTubeVideoPlayerWithProgress({
     if (!player) return;
 
     const currentTime = Math.floor(player.getCurrentTime());
+
+    if (lastPosition.current === currentTime) return;
+
+    if (isSeeking.current) {
+      lastPosition.current = currentTime;
+      isSeeking.current = false;
+      return;
+    }
 
     const watchedSeconds = currentTime - lastPosition.current;
 
@@ -77,6 +89,7 @@ function YouTubeVideoPlayerWithProgress({
         lessonId,
         currentTime,
         watchedSeconds,
+        completed
       })
     );
   };
@@ -109,12 +122,17 @@ function YouTubeVideoPlayerWithProgress({
     };
   }, []);
 
+  const markLessonAsComplete = async (currentTime: number) => {
+    await updateLessonProgress(userId, lessonId, currentTime, 0, true);
+    lastPosition.current = 0;
+  };
+
   const onReady = (event: YouTubeEvent) => {
     playerRef.current = event.target;
     const player = playerRef.current;
 
     if (stoppedAt) {
-      const targetTime = Math.floor(stoppedAt);
+      const targetTime = Math.floor(stoppedAt - 5);
       player.seekTo(targetTime, true);
       player.playVideo();
       lastPosition.current = targetTime;
@@ -122,12 +140,19 @@ function YouTubeVideoPlayerWithProgress({
   };
 
   const onStateChange = (event: YouTubeEvent) => {
+    // if user pauses the video
     if (event.data === 2) {
       saveProgress();
     }
-
+    
+    // if user seeks the video
     if (event.data === 3) {
       isSeeking.current = true;
+    }
+
+    // if user completes the video
+    if (event.data === 0) {
+      markLessonAsComplete(Math.floor(event.target.getDuration()));
     }
   };
 
