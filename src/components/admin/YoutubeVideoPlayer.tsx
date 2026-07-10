@@ -3,6 +3,7 @@
 import { updateLessonProgress } from "@/features/lessons/action";
 import { useEffect, useRef } from "react";
 import YouTube, { YouTubeEvent } from "react-youtube";
+import { Button } from "../ui/button";
 
 type Prop1 = {
   action: true;
@@ -61,6 +62,25 @@ function YouTubeVideoPlayerWithProgress({
     lastPosition.current = currentTime;
   };
 
+  const sendProgressBeacon = () => {
+    const player = playerRef.current;
+    if (!player) return;
+
+    const currentTime = Math.floor(player.getCurrentTime());
+
+    const watchedSeconds = currentTime - lastPosition.current;
+
+    navigator.sendBeacon(
+      "/api/progress",
+      JSON.stringify({
+        userId,
+        lessonId,
+        currentTime,
+        watchedSeconds,
+      })
+    );
+  };
+
   // Keep saveProgress reference up-to-date to avoid stale closures in the event listener
   const saveProgressRef = useRef(saveProgress);
   saveProgressRef.current = saveProgress;
@@ -73,21 +93,17 @@ function YouTubeVideoPlayerWithProgress({
         }
       }
     };
-
+    
     const handlePageHide = () => {
-      if (lastPosition.current > 0) {
-        saveProgressRef.current();
-      }
+      sendProgressBeacon();
     };
 
-    window.addEventListener("pagehide", handlePageHide);
     document.addEventListener("visibilitychange", handleVisibilityChange);
-
+    window.addEventListener("pagehide", handlePageHide);
+    
     return () => {
-      if (lastPosition.current > 0) {
-        saveProgressRef.current();
-      }
-
+      sendProgressBeacon();
+      
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.removeEventListener("pagehide", handlePageHide);
     };
@@ -111,7 +127,6 @@ function YouTubeVideoPlayerWithProgress({
     }
 
     if (event.data === 3) {
-      console.log("Bluffering...")
       isSeeking.current = true;
     }
   };
