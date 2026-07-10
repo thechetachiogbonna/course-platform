@@ -77,12 +77,10 @@ export default function LessonPlayerSidebar({
   );
 
   const completedLessons = sections.reduce(
-    (acc, section) => acc + section.lessons.filter((lesson) => lesson.completed).length,
+    (acc, section) =>
+      acc + section.lessons.filter((lesson) => lesson.completed).length,
     0,
   );
-
-  console.log(totalLessons, completedLessons );
-  console.log(sections)
 
   const progress =
     totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
@@ -117,9 +115,7 @@ export default function LessonPlayerSidebar({
           </button>
         </div>
 
-        <h2 className="text-xl font-semibold text-white mt-5">
-          {courseName}
-        </h2>
+        <h2 className="text-xl font-semibold text-white mt-5">{courseName}</h2>
 
         <div className="mt-4 h-1.5 w-full bg-[#201f1f] rounded-full overflow-hidden">
           <div
@@ -151,7 +147,6 @@ export default function LessonPlayerSidebar({
                   {section.name}
                 </span>
 
-
                 {!openSections[section.id] && (
                   <span className="text-left text-[10px] mt-1 ml-2 font-medium text-[#c9c8ab]">
                     {section.lessons.length} lessons
@@ -170,7 +165,7 @@ export default function LessonPlayerSidebar({
             {openSections[section.id] && (
               <div className="space-y-1 mt-1">
                 {section.lessons.map((lesson) => {
-                  const isCompleted = false
+                  const isCompleted = lesson.completed;
                   const isActive = activeLessonId === lesson.id;
 
                   return (
@@ -191,13 +186,13 @@ export default function LessonPlayerSidebar({
 
                       <div className="flex-1 min-w-0">
                         <div className="flex justify-between items-center gap-3">
-                            <span title={lesson.name} className="truncate">
-                              {lesson.name}
-                            </span>
+                          <span title={lesson.name} className="truncate">
+                            {lesson.name}
+                          </span>
 
                           <div className="flex items-end gap-2">
                             <span className="font-mono text-[11px]">
-                              {`${Math.floor(lesson.duration / 60)}:${String(Math.floor(lesson.duration % 60)).padStart(2, '0')}`}
+                              {`${Math.floor(lesson.duration / 60)}:${String(Math.floor(lesson.duration % 60)).padStart(2, "0")}`}
                             </span>
 
                             {lesson.status === "preview" && (
@@ -207,7 +202,7 @@ export default function LessonPlayerSidebar({
                             )}
                           </div>
                         </div>
-                    </div>
+                      </div>
                     </Link>
                   );
                 })}
