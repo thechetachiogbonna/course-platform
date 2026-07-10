@@ -125,7 +125,7 @@ export default async function PurchaseSuccessPage({
             priority
             unoptimized
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-background-dark via-background-dark/45 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-t from-background-dark via-background-dark/45 to-transparent" />
           <div className="absolute bottom-6 left-6 right-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
               <span className="text-[10px] font-bold text-brand-yellow uppercase tracking-widest bg-brand-yellow/15 border border-brand-yellow/20 px-2.5 py-1 rounded-md mb-2 inline-block">

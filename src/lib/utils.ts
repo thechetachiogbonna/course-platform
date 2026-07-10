@@ -44,11 +44,17 @@ export const getCurrentStreak = (dates: string[]) => {
 
   while (true) {
     const key = formatDate(current);
-    
+    const today = formatDate(new Date());
+
+    if (key === today && !activeDays.has(key)) {
+      current.setDate(current.getDate() - 1);
+      continue;
+    }
+
     if (!activeDays.has(key)) {
       break;
     }
-    
+
     streak++;
     current.setDate(current.getDate() - 1);
   }

@@ -54,7 +54,7 @@ function CourseCard({ course }: { course: UserCourse }) {
           </div>
         )}
         {/* Gradient */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent" />
       </div>
 
       {/* Content */}

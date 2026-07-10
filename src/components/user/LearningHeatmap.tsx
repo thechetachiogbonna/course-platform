@@ -96,8 +96,6 @@ export default function LearningHeatmap({ activity, currentStreak }: Props) {
     });
   }, [weeks]);
 
-  console.log(JSON.stringify(weeks, null, 2));
-
   return (
     <div className="glass-card rounded-2xl border border-[#252525] p-6">
       <div className="mb-6 flex items-center justify-between">
