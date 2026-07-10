@@ -44,6 +44,7 @@ interface Lesson {
   youtubeVideoId: string;
   status: "public" | "private" | "preview";
   order: number;
+  duration: number;
 }
 
 type ActivityDay = {

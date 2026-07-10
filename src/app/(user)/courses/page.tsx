@@ -13,7 +13,10 @@ const getMyCourses = async (userId: string) => {
         c.description as course_description,
         COUNT(DISTINCT l.id) as total_lessons,
         COUNT(DISTINCT CASE WHEN ulp.completed = TRUE THEN l.id END) as completed_lessons,
-        (COUNT(DISTINCT CASE WHEN ulp.completed = TRUE THEN l.id END) * 100) / COUNT(DISTINCT l.id) as progress_percent
+        ROUND((
+          COALESCE(SUM(ulp.progress_seconds), 0)::numeric 
+          / NULLIF(SUM(l.duration), 0)
+          ) * 100) AS progress_percent
       FROM user_course_access AS uca
       INNER JOIN courses c
         ON uca.course_id = c.id

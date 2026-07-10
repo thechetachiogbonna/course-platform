@@ -46,7 +46,7 @@ const lessonFormSchema = z.object({
   description: z.string(),
   youtubeVideoId: z.string().min(1, "Please proveide a youtube video Id"),
   status: z.enum(["public", "private", "preview"]),
-  sectionId: z.string().min(1, "Please select a section"),
+  sectionId: z.string().min(1, "Please select a section")
 });
 
 type LessonFormValues = z.infer<typeof lessonFormSchema>;
@@ -71,6 +71,7 @@ export default function LessonForm({
   sections,
 }: LessonFormProps) {
   const [open, setOpen] = useState(false);
+  const [lessonDuration, setLessonDuration] = useState(lesson?.duration || 0);
   const form = useForm<LessonFormValues>({
     resolver: zodResolver(lessonFormSchema),
     defaultValues: {
@@ -78,7 +79,7 @@ export default function LessonForm({
       description: lesson?.description || "",
       youtubeVideoId: lesson?.youtubeVideoId || "",
       status: lesson?.status || "preview",
-      sectionId: lesson ? sectionId : "",
+      sectionId: lesson ? sectionId : ""
     },
   });
 
@@ -89,7 +90,12 @@ export default function LessonForm({
         return;
       }
 
-      const result = await createLesson({ ...values, order: nextLessonOrder });
+      if (lessonDuration <= 0) {
+        toast.error("Please set a youtube video id to calculate the lesson duration");
+        return;
+      }
+
+      const result = await createLesson({ ...values, duration: lessonDuration, order: nextLessonOrder });
 
       if (result.error) {
         toast.error(result.message);
@@ -104,9 +110,15 @@ export default function LessonForm({
       if (!lesson) return;
       if (!lesson.id) return;
 
+      if (lessonDuration <= 0) {
+        toast.error("Please set a youtube video id to calculate the lesson duration");
+        return;
+      }
+
       const result = await updateLesson(lesson.id, {
         ...values,
-        order: lesson.order,
+        duration: lessonDuration,
+        order: lesson.order
       });
 
       if (result.error) {
@@ -131,10 +143,10 @@ export default function LessonForm({
             </DialogTitle>
 
             <div className="inline-flex items-center gap-2 rounded-xl border border-white/5 bg-[#201f1f] px-3 py-2 shadow-inner">
-              <FolderOpen className="h-4 w-4 text-[#e2ec00]" />
+              <FolderOpen className="h-4 w-4 text-brand-yellow" />
               <span className="text-xs leading-none font-medium text-[#c9c8ab]">
                 {type === "create" ? "Adding to Section: " : "Editing: "}
-                <span className="font-semibold text-[#e2ec00]">
+                <span className="font-semibold text-brand-yellow">
                   {sectionName}
                 </span>
               </span>
@@ -195,7 +207,11 @@ export default function LessonForm({
               />
 
               {youtubeVideoId && (
-                <YouTubeVideoPlayer action={false} videoId={youtubeVideoId} />
+                <YouTubeVideoPlayer
+                  action={false}
+                  videoId={youtubeVideoId}
+                  setLessonDuration={setLessonDuration}
+                />
               )}
 
               <FormField
@@ -203,11 +219,16 @@ export default function LessonForm({
                 name="youtubeVideoId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel
-                      className={cn(fieldLabelAltClassName, "ml-1 block")}
-                    >
-                      YouTube Video ID
-                    </FormLabel>
+                    <div className="flex items-center justify-between">
+                      <FormLabel className={cn(fieldLabelAltClassName, "ml-1 block")}>
+                        YouTube Video ID
+                      </FormLabel>
+                      {lessonDuration > 0 && (
+                        <span className="text-xs font-semibold text-brand-yellow font-mono">
+                          {Math.floor(lessonDuration / 60)}m {lessonDuration % 60}s
+                        </span>
+                      )}
+                    </div>
                     <FormControl>
                       <div className="relative">
                         <span className="absolute top-1/2 left-4 -translate-y-1/2 text-white/30">
@@ -296,7 +317,7 @@ export default function LessonForm({
                 <Button
                   type="submit"
                   disabled={form.formState.isSubmitting}
-                  className="flex h-auto w-full items-center justify-center gap-1.5 rounded-xl bg-[#e2ec00] py-4 text-xs font-bold tracking-wider text-[#1c1d00] uppercase shadow-[0_4px_12px_rgba(226,236,0,0.15)] hover:brightness-110 active:scale-95"
+                  className="flex h-auto w-full items-center justify-center gap-1.5 rounded-xl bg-brand-yellow py-4 text-xs font-bold tracking-wider text-[#1c1d00] uppercase shadow-[0_4px_12px_rgba(226,236,0,0.15)] hover:brightness-110 active:scale-95"
                 >
                   {type === "create" ? (
                     <PlusCircle className="h-4 w-4" />

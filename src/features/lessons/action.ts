@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 export const createLesson = async (lessonData: Omit<Lesson, "id">) => {
   try {
     const result = await db.query(
-      `INSERT INTO lessons (name, description, status, "order", youtube_video_id, section_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+      `INSERT INTO lessons (name, description, status, "order", youtube_video_id, section_id, duration) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
       [
         lessonData.name,
         lessonData.description,
@@ -14,6 +14,7 @@ export const createLesson = async (lessonData: Omit<Lesson, "id">) => {
         lessonData.order,
         lessonData.youtubeVideoId,
         lessonData.sectionId,
+        lessonData.duration,
       ],
     );
 
@@ -53,7 +54,7 @@ export const updateLesson = async (
     const courseId = sectionResult.rows[0]?.course_id;
 
     await db.query(
-      `UPDATE lessons SET name = $1, description = $2, status = $3, "order" = $4, youtube_video_id = $5, section_id = $6 WHERE id = $7`,
+      `UPDATE lessons SET name = $1, description = $2, status = $3, "order" = $4, youtube_video_id = $5, section_id = $6, duration = $7 WHERE id = $8`,
       [
         lessonData.name,
         lessonData.description,
@@ -61,6 +62,7 @@ export const updateLesson = async (
         lessonData.order,
         lessonData.youtubeVideoId,
         lessonData.sectionId,
+        lessonData.duration,
         lessonId,
       ],
     );

@@ -25,7 +25,8 @@ const getCourseSectionsLessons = async (courseId: string) => {
         l.description AS lesson_description,
         l.status AS lesson_status,
         l.order AS lesson_order,
-        l.youtube_video_id AS lesson_youtube_video_id
+        l.youtube_video_id AS lesson_youtube_video_id,
+        l.duration AS lesson_duration
       FROM courses c
       LEFT JOIN sections s
         ON c.id = s.course_id
@@ -71,6 +72,7 @@ const getCourseSectionsLessons = async (courseId: string) => {
         youtubeVideoId: row.lesson_youtube_video_id,
         status: row.lesson_status,
         order: row.lesson_order,
+        duration: Number(row.lesson_duration || 0),
       });
     }
   }

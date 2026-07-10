@@ -51,8 +51,14 @@ export default function LessonList({
 
                 <div className="flex items-center gap-1 shrink-0">
                   {getLessonIcon(lesson.status)}
-
-                  <div className="flex items-center gap-1.5 ml-2 border-l border-white/10 pl-2"></div>
+                  
+                  {lesson.duration > 0 && (
+                    <div className="flex items-center gap-1.5 ml-2 border-l border-white/10 pl-2">
+                      <span className="text-[10px] text-[#c9c8ab] font-mono">
+                        {Math.floor(lesson.duration / 60)}m {lesson.duration % 60}s
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

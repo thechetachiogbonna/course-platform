@@ -7,7 +7,7 @@ import { Menu } from "lucide-react";
 import { notFound } from "next/navigation";
 
 interface CourseDetails extends Course {
-  sections: (Section & { lessons: (Lesson & { progressInSeconds: number | null, completed: boolean | null })[] })[];
+  sections: (Section & { lessons: (Lesson & { progressInSeconds: number | null, completed: boolean })[] })[];
 }
 
 const getCourseSectionsLessons = async (courseId: string, userId: string) => {
@@ -29,6 +29,7 @@ const getCourseSectionsLessons = async (courseId: string, userId: string) => {
         l.status AS lesson_status,
         l.order AS lesson_order,
         l.youtube_video_id AS lesson_youtube_video_id,
+        l.duration AS lesson_duration,
         ulp.progress_seconds AS progress_seconds,
         ulp.completed AS completed
       FROM courses c
@@ -79,7 +80,9 @@ const getCourseSectionsLessons = async (courseId: string, userId: string) => {
         youtubeVideoId: row.lesson_youtube_video_id,
         status: row.lesson_status,
         order: row.lesson_order,
+        duration: Number(row.lesson_duration || 0),
         progressInSeconds: row.progress_seconds,
+        completed: row.completed || false
       });
     }
   }
@@ -158,7 +161,7 @@ export default async function LessonPage({
             />
             <div className="hidden md:flex items-center gap-3">
               <span className="text-xs font-medium text-[#e5e2e1]">
-                {course.name}
+                {activeLesson.name}
               </span>
             </div>
           </div>

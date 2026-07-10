@@ -16,6 +16,7 @@ type Prop1 = {
 type Prop2 = {
   action: false;
   videoId: string;
+  setLessonDuration: (duration: number) => void;
 };
 
 type YoutubeVideoPlayerProps = Prop1 | Prop2;
@@ -25,11 +26,17 @@ export default function YouTubeVideoPlayer(props: YoutubeVideoPlayerProps) {
     return <YouTubeVideoPlayerWithProgress {...props} />;
   }
 
+  const onReady = (event: YouTubeEvent) => {
+    const duration = Math.floor(event.target.getDuration());
+    props.setLessonDuration(duration);
+  }
+
   return (
     <YouTube
       videoId={props.videoId}
       className="aspect-video"
       opts={{ width: "100%", height: "100%" }}
+      onReady={onReady}
     />
   );
 }

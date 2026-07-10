@@ -16,7 +16,7 @@ import { Badge } from "../ui/badge";
 import { cn } from "@/lib/utils";
 
 interface LessonPlayerSidebarProps {
-  sections: (Section & { lessons: Lesson[] })[];
+  sections: (Section & { lessons: (Lesson & { completed: boolean })[] })[];
   activeLessonId: string;
   courseId: string;
   courseName: string;
@@ -76,7 +76,13 @@ export default function LessonPlayerSidebar({
     0,
   );
 
-  const completedLessons = [].length;
+  const completedLessons = sections.reduce(
+    (acc, section) => acc + section.lessons.filter((lesson) => lesson.completed).length,
+    0,
+  );
+
+  console.log(totalLessons, completedLessons );
+  console.log(sections)
 
   const progress =
     totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
@@ -94,7 +100,7 @@ export default function LessonPlayerSidebar({
       <div className="p-6 border-b border-[#252524]">
         <div className="flex items-center justify-between">
           <Link
-            href="/courses"
+            href={`/courses/${courseId}`}
             className="flex items-center gap-2 text-brand-yellow hover:opacity-80 transition-opacity"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -140,9 +146,18 @@ export default function LessonPlayerSidebar({
               }
               className="w-full flex items-center justify-between px-4 py-3 rounded-lg hover:bg-white/5 transition-colors"
             >
-              <span className="text-[11px] font-bold text-[#c9c8ab] uppercase tracking-wider">
-                {section.name}
-              </span>
+              <div className="flex flex-col">
+                <span className="text-[11px] font-bold text-[#c9c8ab] uppercase tracking-wider">
+                  {section.name}
+                </span>
+
+
+                {!openSections[section.id] && (
+                  <span className="text-left text-[10px] mt-1 ml-2 font-medium text-[#c9c8ab]">
+                    {section.lessons.length} lessons
+                  </span>
+                )}
+              </div>
 
               <ChevronDown
                 className={cn(
@@ -174,15 +189,25 @@ export default function LessonPlayerSidebar({
                         completed: isCompleted,
                       })}
 
-                      <span className="text-sm font-medium flex-1 text-left">
-                        {lesson.name}
-                      </span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex justify-between items-center gap-3">
+                            <span title={lesson.name} className="truncate">
+                              {lesson.name}
+                            </span>
 
-                      {lesson.status === "preview" && (
-                        <Badge className="bg-brand-yellow text-black hover:bg-brand-yellow text-[10px] font-bold uppercase rounded-full px-2 py-0">
-                          Free
-                        </Badge>
-                      )}
+                          <div className="flex items-end gap-2">
+                            <span className="font-mono text-[11px]">
+                              {`${Math.floor(lesson.duration / 60)}:${String(Math.floor(lesson.duration % 60)).padStart(2, '0')}`}
+                            </span>
+
+                            {lesson.status === "preview" && (
+                              <Badge className="bg-brand-yellow text-black hover:bg-brand-yellow text-[10px] font-bold uppercase rounded-full px-2 py-0">
+                                Free
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                    </div>
                     </Link>
                   );
                 })}
