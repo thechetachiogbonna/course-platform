@@ -155,7 +155,7 @@ export default async function CourseDetailPage({
   const heroImage = `https://img.youtube.com/vi/${currentLesson.youtubeVideoId}/maxresdefault.jpg`;
 
   const actionText = lastWatchedLesson ? "Continue Learning" : "Start Learning";
-  console.log(lastWatchedLesson);
+  
   return (
     <div className="w-full max-w-5xl mx-auto pb-28">
       <section className="relative w-full h-[50dvh] md:h-100 rounded-2xl overflow-hidden mb-8 mx-0">

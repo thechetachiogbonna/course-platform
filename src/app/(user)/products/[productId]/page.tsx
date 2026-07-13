@@ -6,6 +6,8 @@ import { formatString } from "@/lib/utils";
 import Price from "@/components/user/Price";
 import Link from "next/link";
 import { PlayCircle } from "lucide-react";
+import { userOwnsProduct } from "@/features/products/action";
+import { getCurrentUser } from "@/features/users/action";
 
 interface ProductInterface {
   id: string;
@@ -110,7 +112,12 @@ export default async function ProductDetailPage({
   params: Promise<{ productId: string }>;
 }) {
   const { productId } = await params;
-  const product = await getProduct(productId);
+
+  const [product, { user }] = await Promise.all([
+    getProduct(productId),
+    getCurrentUser(),
+  ]);
+
   if (!product) notFound();
 
   const totalLessons = product.courses?.reduce(
@@ -121,6 +128,8 @@ export default async function ProductDetailPage({
     (acc, course) => acc + Number(course.section_count || 0),
     0,
   );
+
+  const ownsProduct = await userOwnsProduct(user.id, productId);
 
   return (
     <div className="w-full max-w-5xl mx-auto pb-28">
@@ -219,7 +228,8 @@ export default async function ProductDetailPage({
                       <div className="flex items-center gap-2">
                         <Link
                           href={`/courses/${course.id}`}
-                          className="text-brand-yellow text-xs font-bold py-2 px-4 rounded-xl hover:bg-brand-yellow/10 transition-all flex items-center gap-1 uppercase tracking-wider cursor-pointer">
+                          className="text-brand-yellow text-xs font-bold py-2 px-4 rounded-xl hover:bg-brand-yellow/10 transition-all flex items-center gap-1 uppercase tracking-wider cursor-pointer"
+                        >
                           <PlayCircle className="w-3.5 h-3.5" />
                           <span>View Course</span>
                         </Link>
@@ -242,12 +252,22 @@ export default async function ProductDetailPage({
 
             {/* CTAs */}
             <div className="space-y-3 mb-6">
-              <Link
-                href={`/products/${product.id}/purchase`}
-                className="block text-center w-full bg-brand-yellow hover:brightness-110 active:scale-95 text-[#1b1d00] font-bold text-sm py-3 rounded-xl transition-all shadow-md"
-              >
-                Buy Now
-              </Link>
+              {ownsProduct ? (
+                <Link
+                  href={`/courses/${product.courses?.[0].id}`}
+                  className="flex items-center justify-center gap-2 w-full bg-brand-yellow hover:brightness-110 active:scale-95 text-[#1b1d00] font-bold text-sm py-3 rounded-xl transition-all shadow-md"
+                >
+                  <PlayCircle className="w-5 h-5" />
+                  Start Learning
+                </Link>
+              ) : (
+                <Link
+                  href={`/products/${product.id}/purchase`}
+                  className="block text-center w-full bg-brand-yellow hover:brightness-110 active:scale-95 text-[#1b1d00] font-bold text-sm py-3 rounded-xl transition-all shadow-md"
+                >
+                  Buy Now
+                </Link>
+              )}
             </div>
 
             {/* Instructor */}
