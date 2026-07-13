@@ -3,7 +3,7 @@
 import { LayoutDashboard, Boxes, BookOpen, Settings } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { useUser } from "@clerk/nextjs";
+import { UserButton, useUser } from "@clerk/nextjs";
 import { Sidebar, SidebarContent } from "../ui/sidebar";
 
 export default function Navigation() {
@@ -37,14 +37,7 @@ export default function Navigation() {
       <aside className="hidden md:flex flex-col items-center py-6 bg-[#161615] h-screen w-20 border-r border-[#252524] sticky top-0 shrink-0 z-30">
         {/* User Avatar */}
         <div className="mb-8">
-          <div className="w-12 h-12 rounded-full border border-brand-yellow/40 overflow-hidden bg-[#2a2a29]">
-            <img
-              alt={`${user?.firstName} ${user?.lastName}`}
-              src={user?.imageUrl}
-              className="w-full h-full object-cover"
-              referrerPolicy="no-referrer"
-            />
-          </div>
+          <UserButton />
         </div>
 
         {/* Navigation */}
@@ -113,14 +106,8 @@ export default function Navigation() {
               {/* Profile Card */}
               <div className="px-4 mb-6">
                 <div className="flex items-center gap-3 p-3 rounded-xl bg-[#201f1f] border border-[#2d2a2a]">
-                  <div className="w-10 h-10 rounded-full border border-brand-yellow/40 overflow-hidden relative bg-[#2a2a29] shrink-0">
-                    <img
-                      alt={`${user?.firstName} ${user?.lastName}`}
-                      src={user?.imageUrl}
-                      className="w-full h-full object-cover"
-                      referrerPolicy="no-referrer"
-                    />
-                  </div>
+                  <UserButton />
+
                   <div className="truncate">
                     <p className="font-semibold text-sm text-white truncate">
                       {user?.firstName} {user?.lastName}
