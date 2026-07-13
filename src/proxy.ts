@@ -5,6 +5,7 @@ import { setUserCountryHeader } from "./lib/user-country-header";
 
 const isPublicRoute = createRouteMatcher([
   "/sign-in(.*)",
+  "/sign-up(.*)",
   "/api/webhooks/clerk(.*)",
   "/api/webhooks/stripe(.*)",
 ]);

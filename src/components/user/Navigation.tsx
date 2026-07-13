@@ -30,7 +30,8 @@ export default function Navigation() {
 
   const { user } = useUser();
   const pathname = usePathname();
-  const lessonViewPage = pathname.split("/")[1] === "courses" && pathname.includes("lesson");
+  const lessonViewPage =
+    pathname.split("/")[1] === "courses" && pathname.includes("lesson");
 
   const getLessonViewNav = () => {
     return (
@@ -128,7 +129,7 @@ export default function Navigation() {
 
                   const isSelected = currentPath
                     ? item.id === currentPath
-                    : item.id === "products"
+                    : item.id === "products";
 
                   return (
                     <Link
@@ -177,18 +178,6 @@ export default function Navigation() {
             </button>
           );
         })}
-        <button
-          id="m-nav-settings"
-          // onClick={() => onChangeView("settings")}
-          className={`flex flex-col items-center justify-center transition-all ${
-            pathname === "/settings"
-              ? "text-brand-yellow bg-brand-yellow/10 px-3 py-1 rounded-full"
-              : "text-gray-400 opacity-60 hover:opacity-100"
-          }`}
-        >
-          <Settings className="w-5 h-5" />
-          <span className="text-[10px] font-bold mt-1">Settings</span>
-        </button>
       </nav>
     </>
   );

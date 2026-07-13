@@ -176,7 +176,14 @@ export default function LearningHeatmap({ activity, currentStreak }: Props) {
             {formatDuration(hoveredDay.secondsWatched)}
           </>
         ) : (
-          "Hover over a day to see your activity."
+          <>
+            <p className="md:hidden">
+              Click on a day to check your activity
+            </p>
+            <p className="hidden md:block">
+              Hover over a day to see your activity.
+            </p>
+          </>
         )}
       </div>
     </div>
