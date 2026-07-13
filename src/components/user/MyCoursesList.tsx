@@ -3,16 +3,12 @@
 import Image from "next/image";
 import { PlayCircle, Award, BookOpen } from "lucide-react";
 import { useState } from "react";
-import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 
 export interface UserCourse {
   courseId: string;
   courseName: string;
   courseDescription: string | null;
-  courseImageUrl: string | null;
-  totalLessons: number;
-  completedLessons: number;
   progressPercent: number;
 }
 
@@ -33,26 +29,15 @@ function ProgressBar({ percent }: { percent: number }) {
 
 function CourseCard({ course }: { course: UserCourse }) {
   const isComplete = course.progressPercent >= 100;
-  const hasStarted = course.completedLessons > 0;
+  const hasStarted = course.progressPercent > 0;
 
   return (
     <div className="glass-card rounded-xl overflow-hidden group hover:border-brand-yellow/50 transition-all duration-300">
       {/* Thumbnail */}
       <div className="relative h-48 w-full overflow-hidden bg-[#1c1b1b]">
-        {course.courseImageUrl ? (
-          <Image
-            src={course.courseImageUrl}
-            alt={course.courseName}
-            fill
-            className="object-cover group-hover:scale-105 transition-transform duration-500"
-            unoptimized
-            referrerPolicy="no-referrer"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <BookOpen className="w-12 h-12 text-[#474746]" />
-          </div>
-        )}
+        <div className="w-full h-full flex items-center justify-center">
+          <BookOpen className="w-12 h-12 text-[#474746]" />
+        </div>
         {/* Gradient */}
         <div className="absolute inset-0 bg-linear-to-t from-black/40 to-transparent" />
       </div>
@@ -108,11 +93,8 @@ function CourseCard({ course }: { course: UserCourse }) {
 }
 
 export default function MyCoursesList({ courses }: { courses: UserCourse[] }) {
-  const { user } = useUser();
   const [filter, setFilter] = useState<Filter>("all");
   const [search, setSearch] = useState("");
-
-  const userImageUrl = user?.imageUrl || "https://lh3.googleusercontent.com/aida-public/AB6AXuBYkQjXjpr0ph-fTeE_5dG1ikEMmlOMEprfF1Ir8uN3wqMEGcsRpCcA9kAL5lO8TEaJU985JGdwWY2k2XL5IYD7jHduKg0iBPw7nGMc3yDtwwlkf8YZYnQ8kMWbxsWjglXIZgYhnGlScjxP9-X_AaXaBCzkYWFbTmixv4Fk-7aR96jeorA2vnXtWmb5VzFQPZRG_K9vq8oVjDZewmIsIis_GnJdKiMamDSWo6Y6uaIoJxvqKTfhVxbHMzlL7Lq0A07LY0MxdjPqBf8";
 
   const filtered = courses.filter((c) => {
     const matchesSearch = c.courseName
@@ -122,7 +104,7 @@ export default function MyCoursesList({ courses }: { courses: UserCourse[] }) {
     const matchesFilter =
       filter === "all" ||
       (filter === "completed" && c.progressPercent >= 100) ||
-      (filter === "in-progress" && c.progressPercent < 100 && c.completedLessons > 0);
+      (filter === "in-progress" && c.progressPercent < 100 && c.progressPercent > 0);
 
     return matchesSearch && matchesFilter;
   });

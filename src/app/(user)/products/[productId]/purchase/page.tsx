@@ -39,7 +39,5 @@ export default async function PurchasePage({
     return redirect("/");
   }
 
-  console.log(await userOwnsProduct(user.id, productId))
-
   return <StripeCheckout product={product} user={user} />;
 }

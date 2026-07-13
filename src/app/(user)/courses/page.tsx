@@ -11,8 +11,6 @@ const getMyCourses = async (userId: string) => {
         c.id as course_id,
         c.name as course_name,
         c.description as course_description,
-        COUNT(DISTINCT l.id) as total_lessons,
-        COUNT(DISTINCT CASE WHEN ulp.completed = TRUE THEN l.id END) as completed_lessons,
         ROUND((
           COALESCE(SUM(ulp.progress_seconds), 0)::numeric 
           / NULLIF(SUM(l.duration), 0)
@@ -37,10 +35,7 @@ const getMyCourses = async (userId: string) => {
     courseId: row.course_id,
     courseName: row.course_name,
     courseDescription: row.course_description,
-    totalLessons: row.total_lessons,
-    completedLessons: row.completed_lessons,
     progressPercent: row.progress_percent,
-    courseImageUrl: row.course_image_url,
   }));
 };
 

@@ -1,15 +1,20 @@
 import SectionList from "@/components/user/SectionList";
 import { db } from "@/database/db";
+import { getCurrentUser } from "@/features/users/action";
 import { formatString } from "@/lib/utils";
+import { Play } from "lucide-react";
 import { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
+type LessonWithLastWatched = Lesson & { lastWatched: string | null };
+
 interface CourseDetails extends Course {
-  sections: (Section & { lessons: Lesson[] })[];
+  sections: (Section & { lessons: LessonWithLastWatched[] })[];
 }
 
-const getCourse = async (courseId: string) => {
+const getCourse = async (courseId: string, userId: string) => {
   const result = await db.query(
     `
       SELECT
@@ -29,19 +34,21 @@ const getCourse = async (courseId: string) => {
         l.status AS lesson_status,
         l.order AS lesson_order,
         l.youtube_video_id AS lesson_youtube_video_id,
-        l.duration AS lesson_duration
+        l.duration AS lesson_duration,
 
+        ulp.updated_at AS last_watched
       FROM courses c
       LEFT JOIN sections s
-        ON s.course_id = c.id
+        ON s.course_id = c.id AND s.status = 'public'
       LEFT JOIN lessons l
-        ON l.section_id = s.id
+        ON l.section_id = s.id AND l.status IN ('public', 'preview')
+      LEFT JOIN user_lesson_progress ulp
+        ON ulp.user_id = $2 AND ulp.lesson_id = l.id
 
-      WHERE c.id = $1 AND l.status IN ('public', 'preview')
-
+      WHERE c.id = $1
       ORDER BY s.order ASC, l.order ASC;
     `,
-    [courseId]
+    [courseId, userId],
   );
 
   if (!result.rows.length) {
@@ -58,7 +65,10 @@ const getCourse = async (courseId: string) => {
     sections: [],
   };
 
-  const sectionMap = new Map<string, Section & { lessons: Lesson[] }>();
+  const sectionMap = new Map<
+    string,
+    Section & { lessons: LessonWithLastWatched[] }
+  >();
 
   for (const row of result.rows) {
     if (row.section_id && !sectionMap.has(row.section_id)) {
@@ -84,7 +94,8 @@ const getCourse = async (courseId: string) => {
         status: row.lesson_status,
         order: row.lesson_order,
         duration: Number(row.lesson_duration || 0),
-      } as Lesson);
+        lastWatched: row.last_watched,
+      } as LessonWithLastWatched);
     }
   }
 
@@ -97,7 +108,8 @@ export async function generateMetadata({
   params: Promise<{ courseId: string }>;
 }): Promise<Metadata> {
   const { courseId } = await params;
-  const course = await getCourse(courseId);
+  const { user } = await getCurrentUser();
+  const course = await getCourse(courseId, user.id);
   if (!course) {
     return {
       title: "Course Not Found",
@@ -115,20 +127,40 @@ export default async function CourseDetailPage({
   params: Promise<{ courseId: string }>;
 }) {
   const { courseId } = await params;
-  const course = await getCourse(courseId);
+  const { user } = await getCurrentUser();
+  const course = await getCourse(courseId, user.id);
   if (!course) notFound();
 
   const totalLessons = course.sections?.reduce(
     (acc, section) => acc + section.lessons.length,
     0,
   );
-  const totalSections = course.sections.length
+  const totalSections = course.sections.length;
 
+  const lastWatchedLesson = course.sections
+    .flatMap((section) => section.lessons)
+    .reduce<LessonWithLastWatched | null>((latest, lesson) => {
+      if (!lesson.lastWatched) return latest;
+      if (!latest) return lesson;
+
+      return new Date(lesson.lastWatched) > new Date(latest.lastWatched!)
+        ? lesson
+        : latest;
+    }, null);
+
+  const firstLesson = course.sections[0]?.lessons[0];
+
+  const currentLesson = lastWatchedLesson ?? firstLesson;
+
+  const heroImage = `https://img.youtube.com/vi/${currentLesson.youtubeVideoId}/maxresdefault.jpg`;
+
+  const actionText = lastWatchedLesson ? "Continue Learning" : "Start Learning";
+  console.log(lastWatchedLesson);
   return (
     <div className="w-full max-w-5xl mx-auto pb-28">
-      <section className="relative w-full h-72 md:h-100 rounded-2xl overflow-hidden mb-8 mx-0">
+      <section className="relative w-full h-[50dvh] md:h-100 rounded-2xl overflow-hidden mb-8 mx-0">
         <Image
-          src={"/images/null"}
+          src={heroImage}
           alt={course.name}
           fill
           priority
@@ -138,24 +170,53 @@ export default async function CourseDetailPage({
         />
         <div className="absolute inset-0 bg-linear-to-t from-background-dark via-background-dark/40 to-transparent" />
 
-        <div className="absolute bottom-0 left-0 w-full px-5 pb-6">
-          <h1 className="text-2xl md:text-4xl font-extrabold text-white leading-tight mb-2">
+        <div className="absolute -bottom-8 left-0 w-full px-6 pb-8">
+          <p className="text-brand-yellow font-medium text-sm mb-2">
+            {actionText}
+          </p>
+
+          <h1 className="text-3xl md:text-5xl font-extrabold text-white">
             {course.name}
           </h1>
 
-          <div className="flex items-center gap-3 flex-wrap">
-            <div className="flex items-center gap-1">
-              <span className="text-xs text-[#929277] ml-1">1.2k students</span>
-            </div>
-            <span className="text-[#929277] text-xs">•</span>
-            <span className="text-xs text-[#929277]">
+          <p className="text-white/90 mt-2 text-lg">{currentLesson?.name}</p>
+
+          <div className="flex items-center gap-3 mt-3 text-sm text-white/70">
+            <span>
               {formatString({
-                number: Number(course.sections?.length),
-                plural: "Sections",
+                number: totalSections,
                 singular: "Section",
+                plural: "Sections",
               })}
             </span>
+
+            <span>•</span>
+
+            <span>
+              {formatString({
+                number: totalLessons,
+                singular: "Lesson",
+                plural: "Lessons",
+              })}
+            </span>
+
+            {currentLesson && (
+              <>
+                <span>•</span>
+                <span>{Math.ceil(currentLesson.duration / 60)} min</span>
+              </>
+            )}
           </div>
+
+          {currentLesson && (
+            <Link
+              href={`/courses/${course.id}/lessons/${currentLesson.id}`}
+              className="inline-flex items-center gap-2 mt-6 bg-brand-yellow text-black px-6 py-3 rounded-xl font-semibold hover:scale-105 transition"
+            >
+              <Play className="size-5 fill-current" />
+              {lastWatchedLesson ? "Continue Watching" : "Start Course"}
+            </Link>
+          )}
         </div>
       </section>
 
@@ -189,7 +250,7 @@ export default async function CourseDetailPage({
               </span>
             </div>
 
-           <SectionList courseId={course.id} sections={course.sections} />
+            <SectionList courseId={course.id} sections={course.sections} />
           </section>
         </div>
       </div>
