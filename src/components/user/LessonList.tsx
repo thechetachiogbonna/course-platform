@@ -1,6 +1,10 @@
+"use client";
+
 import { Circle, Eye, Lock, PlaySquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Badge } from "../ui/badge";
 
 export default function LessonList({
   courseId,
@@ -9,7 +13,23 @@ export default function LessonList({
   courseId: string;
   lessons: Lesson[];
 }) {
+  const pathname = usePathname();
+
   const getLessonIcon = (status: "public" | "preview" | "private") => {
+    if (pathname.startsWith("/courses")) {
+      switch (status) {
+        case "preview":
+          return (
+            <Badge className="bg-brand-yellow text-black hover:bg-brand-yellow text-[10px] font-bold uppercase rounded-full px-2 py-0">
+              Free
+            </Badge>
+          );
+        case "public":
+        case "private":
+          return <Lock className="h-4 w-4 text-red-500 shrink-0" />;
+      }
+    }
+
     switch (status) {
       case "preview":
         return <Eye className="h-4 w-4 text-brand-yellow shrink-0" />;
