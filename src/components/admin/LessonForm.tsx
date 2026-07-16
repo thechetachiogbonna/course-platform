@@ -79,7 +79,7 @@ export default function LessonForm({
       description: lesson?.description || "",
       youtubeVideoId: lesson?.youtubeVideoId || "",
       status: lesson?.status || "preview",
-      sectionId: lesson ? sectionId : ""
+      sectionId: lesson ? lesson.sectionId : sectionId
     },
   });
 

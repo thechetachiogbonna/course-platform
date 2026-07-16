@@ -34,6 +34,7 @@ import {
 import { cn } from "@/lib/utils";
 import { createCourse } from "@/features/courses/action";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const courseFormSchema = z.object({
   name: z.string().min(1, "Please enter a course name."),
@@ -43,6 +44,7 @@ const courseFormSchema = z.object({
 type CourseFormValues = z.infer<typeof courseFormSchema>;
 
 export default function CourseForm() {
+  const router = useRouter()
   const [open, setOpen] = useState(false);
   const form = useForm<CourseFormValues>({
     resolver: zodResolver(courseFormSchema),
@@ -58,8 +60,8 @@ export default function CourseForm() {
       toast.error(result.message);
     } else {
       form.reset();
-      toast.success(result.message);
       setOpen(false);
+      router.push(`/admin/courses/${result.data.id}/edit`);
     }
   };
 

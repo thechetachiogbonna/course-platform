@@ -60,7 +60,7 @@ export default function Navigation() {
                 <div className="truncate">
                   <p className="font-semibold text-sm text-white truncate">
                     {user?.firstName} {user?.lastName}
-                  </p> 
+                  </p>
                   <p className="text-xs text-[#c9c8ab] font-medium truncate">
                     {user?.emailAddresses[0].emailAddress}
                   </p>
@@ -105,16 +105,18 @@ export default function Navigation() {
       >
         {mainNavItems.map((item) => {
           const Icon = item.icon;
-          const isSelected = pathname === item.href;
+          const currentPath: string | undefined = pathname.split("/")[2];
+          const isSelected = currentPath
+            ? item.id === currentPath
+            : item.id === "products";
 
           return (
             <button key={item.id} id={`m-nav-${item.id}`}>
               <Link
-                className={`flex flex-col items-center justify-center transition-all ${
-                  isSelected
-                    ? "text-brand-yellow bg-brand-yellow/10 px-3 py-1 rounded-full"
-                    : "text-gray-400 opacity-60 hover:opacity-100"
-                }`}
+                className={`flex flex-col items-center justify-center transition-all ${isSelected
+                  ? "text-brand-yellow bg-brand-yellow/10 px-3 py-1 rounded-full"
+                  : "text-gray-400 opacity-60 hover:opacity-100"
+                  }`}
                 href={item.href}
               >
                 <Icon className="w-5 h-5" />
@@ -123,18 +125,6 @@ export default function Navigation() {
             </button>
           );
         })}
-        <button
-          id="m-nav-settings"
-          // onClick={() => onChangeView("settings")}
-          className={`flex flex-col items-center justify-center transition-all ${
-            pathname === "/settings"
-              ? "text-brand-yellow bg-brand-yellow/10 px-3 py-1 rounded-full"
-              : "text-gray-400 opacity-60 hover:opacity-100"
-          }`}
-        >
-          <Settings className="w-5 h-5" />
-          <span className="text-[10px] font-bold mt-1">Settings</span>
-        </button>
       </nav>
     </>
   );

@@ -17,8 +17,7 @@ const getCourses = async () => {
       SELECT
         c.*,
         COUNT(DISTINCT s.id) AS section_count,
-        COUNT(DISTINCT l.id) AS lesson_count,
-        c.updated_at AS last_modified
+        COUNT(DISTINCT l.id) AS lesson_count
       FROM courses c
       LEFT JOIN sections s
       ON c.id = s.course_id
@@ -108,7 +107,7 @@ export default async function CoursesPage() {
                           <p className="font-bold text-sm text-white">
                             {course.name}
                           </p>
-                          <p className="text-xs text-[#c9c8ab]">
+                          <p title={course.description || "No description"} className="text-xs text-[#c9c8ab] line-clamp-1">
                             {course.description ||
                               "No description provided for this course."}
                           </p>
@@ -127,8 +126,12 @@ export default async function CoursesPage() {
                     </td>
 
                     {/* Last Modified */}
-                    <td className="px-6 py-4 text-xs text-[#c9c8ab]">
-                      {String(course.last_modified)}
+                    <td className="px-6 py-4 text-xs text-[#c9c8ab] text-nowrap">
+                      {new Date(course.updated_at).toLocaleString(undefined, {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                      })}
                     </td>
 
                     {/* Actions Trigger */}
