@@ -25,6 +25,22 @@ export const createCourse = async (courseData: Partial<Course>) => {
   }
 };
 
+export const userCanAccessCourse = async (userId: string, courseId: string) => {
+  try {
+    const result = await db.query(`
+      SELECT 
+        *
+      FROM user_course_access
+      WHERE user_id = $1 AND course_id = $2
+    `, [userId, courseId]);
+
+    return result.rows.length > 0;
+  } catch (error) {
+    console.log("Error fetching user course access", error)
+    return false
+  }
+}
+
 export const addUserCourseAccess = async ({
   userId,
   courseIds,
