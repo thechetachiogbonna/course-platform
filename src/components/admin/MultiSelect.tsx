@@ -84,7 +84,7 @@ export default function MultiSelect({
           className="w-(--radix-popover-trigger-width) gap-0 rounded-xl border-[#252525] bg-[#131313] p-0 shadow-2xl ring-0"
           onOpenAutoFocus={(e) => e.preventDefault()}
         >
-          <ScrollArea className="max-h-48">
+          <ScrollArea className="max-h-48 overflow-y-scroll">
             {filteredCourses.length === 0 ? (
               <div className="p-3 text-xs text-gray-500 italic">
                 {emptyMessage}
