@@ -15,7 +15,7 @@ export default function UserLayout({
         <main className="flex gap-6 flex-1 w-full max-w-375 mx-auto px-4 pb-10 max-md:pb-28 py-6 overflow-y-auto">
           {children}
         </main>
-        <div className="absolute top-6 right-6">
+        <div className="fixed bottom-4 right-4 md:hidden z-50 bg-background-dark p-1 rounded-full border border-brand-yellow/20">
           <UserButton />
         </div>
       </SidebarProvider>
