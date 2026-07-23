@@ -192,7 +192,7 @@ export default async function LessonPage({
             </div>
           </div>
 
-          <div className="flex px-4 py-1.5 bg-[#1c1b1b] rounded-full border border-[#252524]">
+          <div className="max-md:mr-8 flex px-4 py-1.5 bg-[#1c1b1b] rounded-full border border-[#252524]">
             <span className="text-[11px] font-bold text-brand-yellow uppercase tracking-widest">
               Streak: {streak} Days 🔥
             </span>
