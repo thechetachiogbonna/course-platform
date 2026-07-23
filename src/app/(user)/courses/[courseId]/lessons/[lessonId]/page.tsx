@@ -81,6 +81,7 @@ const getCourseSectionsLessons = async (courseId: string, userId: string) => {
   } as CourseDetails;
 
   const sectionMap = new Map();
+  const seenLessonIds = new Set<string>();
 
   for (const row of result.rows) {
     if (row.section_id && !sectionMap.has(row.section_id)) {
@@ -97,7 +98,8 @@ const getCourseSectionsLessons = async (courseId: string, userId: string) => {
       course.sections.push(section);
     }
 
-    if (row.lesson_id) {
+    if (row.lesson_id && !seenLessonIds.has(row.lesson_id)) {
+      seenLessonIds.add(row.lesson_id);
       sectionMap.get(row.section_id)?.lessons.push({
         id: row.lesson_id,
         name: row.lesson_name,
