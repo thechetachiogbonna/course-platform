@@ -35,7 +35,7 @@ export default function UserLayout({
         </div>
         <main
           className={cn(
-            "flex gap-6 flex-1 w-full max-w-375 mx-auto px-4 pb-10 max-md:pb-28 py-6 overflow-y-auto",
+            "flex gap-6 flex-1 w-full max-w-375 mx-auto px-4 pb-10 max-md:pb-28 py-6 overflow-y-hidden",
             !defaultPages.has(pathname) && "pt-12",
           )}
         >

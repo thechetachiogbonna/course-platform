@@ -170,7 +170,7 @@ export default async function ProductDetailPage({
         <div className="lg:col-span-2 space-y-10">
           <section>
             <h2 className="text-lg font-bold text-white mb-3">
-              About this course
+              About this product
             </h2>
             <p className="text-sm text-[#c9c8ab] leading-relaxed">
               {product.description}

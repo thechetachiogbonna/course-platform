@@ -88,7 +88,7 @@ export default function LessonPlayerSidebar({
   return (
     <aside
       className={cn(
-        "fixed top-0 left-0 bottom-0 z-50 w-[85vw] md:w-80 md:relative md:translate-x-0",
+        "fixed top-0 max-h-screen z-50 w-[85vw] md:w-80 md:sticky md:translate-x-0",
         "bg-[#161615] border-r border-[#252524] overflow-hidden",
         "transition-transform duration-300 ease-out",
         isOpen ? "translate-x-0" : "-translate-x-full",
@@ -130,7 +130,7 @@ export default function LessonPlayerSidebar({
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-4 pb-12">
+      <div className="flex-1 overflow-y-scroll custom-scrollbar p-2 space-y-4 pb-12">
         {sections.map((section) => (
           <div key={section.id}>
             <button

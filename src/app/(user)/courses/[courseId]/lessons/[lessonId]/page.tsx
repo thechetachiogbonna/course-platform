@@ -169,7 +169,7 @@ export default async function LessonPage({
   );
 
   return (
-    <div className="-mx-4 -my-6 flex flex-row min-h-screen w-[calc(100%+2rem)] bg-background-dark text-[#e5e2e1] overflow-hidden!">
+    <div className="-mx-4 -my-6 flex flex-row h-screen w-[calc(100%+2rem)] bg-background-dark text-[#e5e2e1] overflow-hidden!">
       <LessonPlayerSidebar
         activeLessonId={lessonId}
         courseId={courseId}
@@ -177,9 +177,9 @@ export default async function LessonPage({
         sections={course.sections}
       />
 
-      <div className="flex-1 flex flex-col h-screen overflow-hidden custom-scrollbar">
+      <div className="flex-1 flex flex-col min-h-screen overflow-hidden custom-scrollbar">
         {/* Top App Bar */}
-        <header className="sticky top-0 z-40 flex justify-between items-center px-6 py-4 w-full bg-[#131313]/90 backdrop-blur-xl border-b border-[#252524]">
+        <header className="fixed top-0 z-40 flex justify-between items-center px-6 py-4 w-full bg-[#131313]/90 backdrop-blur-xl border-b border-[#252524]">
           <div className="flex items-center gap-6">
             <Menu
               id="menu-btn"
@@ -202,7 +202,7 @@ export default async function LessonPage({
         {!activeLesson ? (
           notFoundLessonContent
         ) : (
-          <div className="p-6 md:p-8 flex-1 flex flex-col gap-8 pb-32 w-full max-w-4xl mx-auto">
+          <div className="pt-10 p-6 md:p-8 flex-1 flex flex-col gap-8 pb-32 w-full max-w-4xl mx-auto overflow-y-auto">
             {/* Video Container */}
             <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-black electric-glow-large border border-white/5 group shadow-2xl">
               {activeLesson.status !== "preview" && !canAccessCourse ? (
