@@ -241,7 +241,7 @@ export default async function PurchasesPage() {
                     ) : (
                       <>
                         <Link
-                          href={`/products/${purchase.productId}`}
+                          href={`/purchases/${purchase.id}`}
                           className="max-sm:w-1/2 max-sm:px-2 text-nowrap px-5 py-2 border border-[#353534] hover:bg-[#252524] text-white text-[11px] font-bold uppercase tracking-wider rounded-lg flex items-center gap-1.5 transition-all"
                         >
                           <Receipt className="w-3.5 h-3.5" />
