@@ -26,17 +26,18 @@ const getPublicProducts = async () => {
 async function page() {
   const [products, user] = await Promise.all([
     getPublicProducts(),
-    getCurrentUser()
-  ])
+    getCurrentUser(),
+  ]);
 
-  const productsWithUserAccess = await Promise.all(products.map(async (p) => {
-    const hasPurchased = await userOwnsProduct(user.user.id, p.id)
-    return {
-      ...p,
-      hasPurchased
-    }
-  }))
-    
+  const productsWithUserAccess = await Promise.all(
+    products.map(async (p) => {
+      const hasPurchased = await userOwnsProduct(user.user.id, p.id);
+      return {
+        ...p,
+        hasPurchased,
+      };
+    }),
+  );
 
   return (
     <section className="w-full space-y-8 pb-16">

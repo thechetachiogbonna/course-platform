@@ -1,10 +1,4 @@
-import {
-  Plus,
-  Search,
-  Edit3,
-  Layers,
-  SlidersHorizontal
-} from "lucide-react";
+import { Plus, Search, Edit3, Layers, SlidersHorizontal } from "lucide-react";
 import Link from "next/link";
 import { db } from "@/database/db";
 
@@ -23,9 +17,9 @@ const getAllProducts = async () => {
       ON cp.course_id = c.id
     GROUP BY p.id
     ORDER BY p.name
-  `)
-  return result.rows
-}
+  `);
+  return result.rows;
+};
 
 export default async function ProductsPage() {
   const products = await getAllProducts();
@@ -100,9 +94,7 @@ export default async function ProductsPage() {
           <span className="text-xs font-bold text-[#c9c8ab] uppercase tracking-wider">
             Public Listings
           </span>
-          <p className="text-4xl font-extrabold text-brand-yellow">
-            {40}
-          </p>
+          <p className="text-4xl font-extrabold text-brand-yellow">{40}</p>
         </div>
 
         {/* Card 3: Inventory Value */}
@@ -186,7 +178,7 @@ export default async function ProductsPage() {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
           {products.map((p) => {
             const isPublic = p.status === "Public";
             return (
