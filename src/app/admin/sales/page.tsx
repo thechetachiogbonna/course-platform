@@ -17,30 +17,9 @@ const getDummyMetrics = () => ({
   lastMonthRevenue: 0,
 });
 
-const getDummyProducts = () => [
-  {
-    id: "1",
-    name: "Pro DJ Masterclass",
-    sales_count: 245,
-    total_revenue: 42800,
-  },
-  {
-    id: "2",
-    name: "Mixing Theory 101",
-    sales_count: 376,
-    total_revenue: 28150,
-  },
-  {
-    id: "3",
-    name: "Nudge AI Premium",
-    sales_count: 627,
-    total_revenue: 61640,
-  },
-];
-
 export default async function SalesPage() {
   let metrics = getDummyMetrics();
-  let productBreakdown = getDummyProducts();
+  let productBreakdown = [];
   let transactions = [];
 
   try {
