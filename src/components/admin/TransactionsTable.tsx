@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Search, RotateCcw, MoreVertical, Loader2 } from "lucide-react";
+import { RotateCcw, MoreVertical, Loader2 } from "lucide-react";
 import { refundPurchase } from "@/features/purchases/action";
 import { toast } from "sonner";
+import SearchInput from "../SearchInput";
 
 export interface Transaction {
   id: string;
@@ -108,21 +109,15 @@ export const TransactionsTable = ({ transactions }: TransactionsTableProps) => {
         <h3 className="text-lg font-bold text-white">Recent Transactions</h3>
         <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
           {/* Search Input */}
-          <div className="relative flex-1 sm:flex-none sm:w-72">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#c9c8ab]">
-              <Search className="w-4 h-4" />
-            </span>
-            <input
-              type="text"
-              placeholder="Search customer or product..."
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                setCurrentPage(1);
-              }}
-              className="w-full bg-[#141414] border border-[#252525] rounded-lg pl-9 pr-3 py-2 text-sm text-white placeholder-[#c9c8ab]/40 focus:outline-none focus:border-brand-yellow/50 transition-all"
-            />
-          </div>
+          <SearchInput
+            value={searchQuery}
+            onChange={(value) => {
+              setSearchQuery(value);
+              setCurrentPage(1);
+            }}
+            placeholder="Search customer or product..."
+            className="flex-1 sm:flex-none sm:w-72"
+          />
 
           {/* Status Filter */}
           <select

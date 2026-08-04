@@ -1,12 +1,18 @@
-import { getUserCoupon } from "@/lib/user-country-header"
-import { formatPrice } from "@/lib/utils"
+import { formatPrice } from "@/lib/utils";
 
-export default async function Price({ price }: { price: number }) {
-  const coupon = await getUserCoupon()
+export default function Price({
+  price,
+  coupon,
+}: {
+  price: number;
+  coupon: Coupon;
+}) {
   if (price === 0 || coupon == null) {
     return (
-      <span className="font-display font-bold text-lg text-brand-yellow">{formatPrice(price)}</span>
-    )
+      <span className="font-display font-bold text-lg text-brand-yellow">
+        {formatPrice(price)}
+      </span>
+    );
   }
 
   return (
@@ -16,5 +22,5 @@ export default async function Price({ price }: { price: number }) {
         {formatPrice(price)}
       </div>
     </div>
-  )
+  );
 }

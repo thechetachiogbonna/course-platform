@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import { Edit, Trash2, Video, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
-import SearchInput from "./SearchInput";
+import SearchInput from "../SearchInput";
 import CourseForm from "./CourseForm";
 
 interface Course {

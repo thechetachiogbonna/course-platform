@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { PlayCircle, Award, BookOpen } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
@@ -19,8 +18,9 @@ function ProgressBar({ percent }: { percent: number }) {
   return (
     <div className="w-full h-1.5 bg-[#353534] rounded-full overflow-hidden">
       <div
-        className={`h-full rounded-full transition-all duration-500 ${isComplete ? "bg-green-500" : "bg-brand-yellow"
-          }`}
+        className={`h-full rounded-full transition-all duration-500 ${
+          isComplete ? "bg-green-500" : "bg-brand-yellow"
+        }`}
         style={{ width: `${Math.min(percent, 100)}%` }}
       />
     </div>
@@ -50,7 +50,9 @@ function CourseCard({ course }: { course: UserCourse }) {
             {course.courseName}
           </h3>
           {isComplete ? (
-            <span className="text-xs font-bold text-green-400 shrink-0">Done</span>
+            <span className="text-xs font-bold text-green-400 shrink-0">
+              Done
+            </span>
           ) : (
             <span className="text-xs font-bold text-brand-yellow shrink-0">
               {Math.floor(course.progressPercent)}%
@@ -70,17 +72,16 @@ function CourseCard({ course }: { course: UserCourse }) {
 
         {/* CTA */}
         {isComplete ? (
-          <button
-            id={`btn-certificate-${course.courseId}`}
+          <Link
+            href={`/courses/${course.courseId}`}
             className="mt-2 w-full py-3 bg-[#2a2a2a] text-white border border-[#474832]/50 font-bold text-xs rounded-lg flex items-center justify-center gap-2 hover:bg-[#353534] active:scale-95 transition-all"
           >
-            View Certificate
+            View Completed Course
             <Award className="w-4 h-4" />
-          </button>
+          </Link>
         ) : (
           <Link
             href={`/courses/${course.courseId}`}
-            id={`btn-continue-${course.courseId}`}
             className="mt-2 w-full py-3 bg-brand-yellow text-[#1b1d00] font-bold text-xs rounded-lg flex items-center justify-center gap-2 hover:brightness-110 active:scale-95 transition-all"
           >
             {hasStarted ? "Continue Learning" : "Start Learning"}
@@ -104,7 +105,9 @@ export default function MyCoursesList({ courses }: { courses: UserCourse[] }) {
     const matchesFilter =
       filter === "all" ||
       (filter === "completed" && c.progressPercent >= 100) ||
-      (filter === "in-progress" && c.progressPercent < 100 && c.progressPercent > 0);
+      (filter === "in-progress" &&
+        c.progressPercent < 100 &&
+        c.progressPercent > 0);
 
     return matchesSearch && matchesFilter;
   });

@@ -1,36 +1,36 @@
-import { headers } from "next/headers"
-import { pppCoupons } from "./ppp-coupon"
+import { headers } from "next/headers";
+import { pppCoupons } from "./ppp-coupon";
 
-const COUNTRY_HEADER_KEY = "x-user-country"
+const COUNTRY_HEADER_KEY = "x-user-country";
 
 export function setUserCountryHeader(
   headers: Headers,
-  country: string | undefined
+  country: string | undefined,
 ) {
   if (country == null) {
-    headers.delete(COUNTRY_HEADER_KEY)
+    headers.delete(COUNTRY_HEADER_KEY);
   } else {
-    headers.set(COUNTRY_HEADER_KEY, country)
+    headers.set(COUNTRY_HEADER_KEY, country);
   }
 }
 
 async function getUserCountry() {
-  const head = await headers()
-  return head.get(COUNTRY_HEADER_KEY)
+  const head = await headers();
+  return head.get(COUNTRY_HEADER_KEY);
 }
 
 export async function getUserCoupon() {
-  const country = await getUserCountry()
-  if (country == null) return
+  const country = await getUserCountry();
+  if (country == null) return null;
 
-  const coupon = pppCoupons.find(coupon =>
-    coupon.countryCodes.includes(country)
-  )
+  const coupon = pppCoupons.find((coupon) =>
+    coupon.countryCodes.includes(country),
+  );
 
-  if (coupon == null) return
+  if (coupon == null) return null;
 
   return {
     stripeCouponId: coupon.stripeCouponId,
     discountPercentage: coupon.discountPercentage,
-  }
+  };
 }

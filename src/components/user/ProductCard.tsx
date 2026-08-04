@@ -3,11 +3,12 @@ import Price from "./Price";
 import { isProductNew } from "@/lib/utils";
 
 interface ProductCardProps {
-  product: Product & { total_students: number, hasPurchased: boolean };
+  product: Product & { total_students: number; hasPurchased: boolean };
+  coupon: Coupon;
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
-  const isNew = isProductNew(product.created_at)
+export default function ProductCard({ product, coupon }: ProductCardProps) {
+  const isNew = isProductNew(product.created_at);
 
   return (
     <div className="glass-card rounded-2xl overflow-hidden flex flex-col group hover:border-brand-yellow/50 hover:electric-glow transition-all duration-300">
@@ -49,7 +50,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
         {/* Action Bottom row */}
         <div className="mt-3 pt-3 border-t border-white/5 flex items-center justify-between">
-          <Price price={product.price} />
+          <Price price={product.price} coupon={coupon} />
           {product.hasPurchased ? (
             <Link
               href={`/products/${product.id}`}

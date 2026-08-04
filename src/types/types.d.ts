@@ -51,3 +51,8 @@ type ActivityDay = {
   date: string; // YYYY-MM-DD
   secondsWatched: number;
 };
+
+type Coupon = {
+  stripeCouponId: string | undefined;
+  discountPercentage: number;
+} | null;
