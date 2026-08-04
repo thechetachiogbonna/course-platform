@@ -8,6 +8,7 @@ import Link from "next/link";
 import { PlayCircle } from "lucide-react";
 import { userOwnsProduct } from "@/features/products/action";
 import { getCurrentUser } from "@/features/users/action";
+import { getUserCoupon } from "@/lib/user-country-header";
 
 interface ProductInterface {
   id: string;
@@ -113,9 +114,10 @@ export default async function ProductDetailPage({
 }) {
   const { productId } = await params;
 
-  const [product, { user }] = await Promise.all([
+  const [product, { user }, coupon] = await Promise.all([
     getProduct(productId),
     getCurrentUser(),
+    getUserCoupon(),
   ]);
 
   if (!product) notFound();
@@ -247,7 +249,7 @@ export default async function ProductDetailPage({
           <div className="glass-card rounded-xl p-6 lg:sticky lg:top-24 electric-glow">
             {/* Price */}
             <div className="flex items-baseline gap-2 mb-6">
-              <Price price={product.price} />
+              <Price price={product.price} coupon={coupon} />
             </div>
 
             {/* CTAs */}
