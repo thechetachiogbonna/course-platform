@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 import { RotateCcw, MoreVertical, Loader2 } from "lucide-react";
 import { refundPurchase } from "@/features/purchases/action";
 import { toast } from "sonner";
-import SearchInput from "../SearchInput";
+import SearchInput from "@/components/SearchInput";
 
 export interface Transaction {
   id: string;

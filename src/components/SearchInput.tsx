@@ -9,6 +9,7 @@ interface SearchInputProps {
   className?: string;
   inputClassName?: string;
   wrapperClassName?: string;
+  iconClassName?: string;
 }
 
 export default function SearchInput({
@@ -18,10 +19,13 @@ export default function SearchInput({
   className = "",
   inputClassName = "",
   wrapperClassName = "",
+  iconClassName = "",
 }: SearchInputProps) {
   return (
     <div className={`relative w-full ${className} ${wrapperClassName}`}>
-      <span className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-[#c9c8ab] shrink-0">
+      <span
+        className={`absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-[#c9c8ab] shrink-0 ${iconClassName}`}
+      >
         <Search className="w-4 h-4 sm:w-5 sm:h-5" />
       </span>
       <input
