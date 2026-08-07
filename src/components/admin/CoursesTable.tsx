@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Edit, Trash2, Video, ChevronLeft, ChevronRight } from "lucide-react";
+import { Edit, Video, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import SearchInput from "@/components/SearchInput";
+import DeleteActionButton from "@/components/ui/DeleteActionButton";
+import { deleteCourse } from "@/features/courses/action";
 import CourseForm from "./CourseForm";
 
 interface Course {
@@ -168,12 +170,15 @@ export default function CoursesTable({ courses }: CoursesTableProps) {
                         >
                           <Edit className="w-4 h-4" />
                         </Link>
-                        <button
-                          className="inline-flex items-center justify-center p-2 sm:p-1.5 rounded-lg text-[#c9c8ab] hover:text-red-400 hover:bg-red-500/10 transition-all"
+                        <DeleteActionButton
+                          onDelete={() => deleteCourse(course.id)}
+                          itemName={course.name}
                           title="Delete course"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                          description={`This action cannot be undone. This will permanently delete "${course.name}" and its related sections and lessons.`}
+                          errorMessage="Failed to delete course"
+                          className="inline-flex items-center justify-center p-2 sm:p-1.5 rounded-lg text-[#c9c8ab] hover:text-red-400 hover:bg-red-500/10 transition-all"
+                          iconClassName="w-4 h-4"
+                        />
                       </div>
                     </td>
                   </tr>

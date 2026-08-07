@@ -1,6 +1,7 @@
 "use server";
 
 import { db } from "@/database/db";
+import { revalidatePath } from "next/cache";
 import { PoolClient } from "pg";
 
 export const createCourse = async (courseData: Partial<Course>) => {
@@ -25,29 +26,59 @@ export const createCourse = async (courseData: Partial<Course>) => {
   }
 };
 
+export const deleteCourse = async (courseId: string) => {
+  try {
+    await db.query("BEGIN");
+    await db.query("DELETE FROM courses WHERE id = $1", [courseId]);
+    await db.query("COMMIT");
+
+    revalidatePath("/admin/courses");
+    revalidatePath("/admin");
+
+    return {
+      error: false,
+      message: "Course deleted successfully",
+    };
+  } catch (error) {
+    await db.query("ROLLBACK");
+    console.error("Error deleting course:", error);
+    return {
+      error: true,
+      message:
+        error instanceof Error ? error.message : "Failed to delete course",
+    };
+  }
+};
+
 export const userCanAccessCourse = async (userId: string, courseId: string) => {
   try {
-    const result = await db.query(`
+    const result = await db.query(
+      `
       SELECT 
         *
       FROM user_course_access
       WHERE user_id = $1 AND course_id = $2
-    `, [userId, courseId]);
+    `,
+      [userId, courseId],
+    );
 
     return result.rows.length > 0;
   } catch (error) {
-    console.log("Error fetching user course access", error)
-    return false
+    console.log("Error fetching user course access", error);
+    return false;
   }
-}
+};
 
-export const addUserCourseAccess = async ({
-  userId,
-  courseIds,
-}: {
-  userId: string;
-  courseIds: string[];
-}, trx: PoolClient) => {
+export const addUserCourseAccess = async (
+  {
+    userId,
+    courseIds,
+  }: {
+    userId: string;
+    courseIds: string[];
+  },
+  trx: PoolClient,
+) => {
   try {
     for (const courseId of courseIds) {
       await trx.query(
