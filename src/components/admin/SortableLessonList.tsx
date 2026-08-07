@@ -1,11 +1,11 @@
 "use client";
 
 import { Edit, PlaySquare } from "lucide-react";
-import DeleteLessonButton from "./DeleteLessonButton";
 import LessonForm from "./LessonForm";
 import { cn } from "@/lib/utils";
 import { SortableItem, SortableList } from "./SortableList";
-import { updateLessonOrder } from "@/features/lessons/action";
+import { deleteLesson, updateLessonOrder } from "@/features/lessons/action";
+import DeleteActionButton from "@/components/ui/DeleteActionButton";
 
 export default function SortableLessonList({
   sections,
@@ -86,9 +86,14 @@ export default function SortableLessonList({
                           </button>
                         </LessonForm>
 
-                        <DeleteLessonButton
-                          lessonId={lesson.id}
-                          lessonName={lesson.name}
+                        <DeleteActionButton
+                          onDelete={() => deleteLesson(lesson.id)}
+                          itemName={lesson.name}
+                          title="Delete Lesson"
+                          description={`This action cannot be undone. This will permanently delete "${lesson.name}".`}
+                          errorMessage="Failed to delete lesson"
+                          className="p-1.5 rounded-lg hover:bg-white/10 text-[#c9c8ab]/60 hover:text-red-500 transition-colors cursor-pointer disabled:opacity-50"
+                          iconClassName="w-3.5 h-3.5"
                         />
                       </div>
                     </div>

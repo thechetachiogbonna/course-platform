@@ -6,9 +6,9 @@ import LessonForm from "./LessonForm";
 import SortableLessonList from "./SortableLessonList";
 import { SortableItem, SortableList } from "./SortableList";
 import SectionForm from "./SectionForm";
-import DeleteSectionButton from "./DeleteSectionButton";
-import { updateSectionOrder } from "@/features/sections/action";
+import { deleteSection, updateSectionOrder } from "@/features/sections/action";
 import { cn } from "@/lib/utils";
+import DeleteActionButton from "@/components/ui/DeleteActionButton";
 
 export default function SortableSectionList({
   course,
@@ -103,9 +103,14 @@ export default function SortableSectionList({
                                 <Edit className="w-3.5 h-3.5" />
                               </button>
                             </SectionForm>
-                            <DeleteSectionButton
-                              sectionId={section.id}
-                              sectionName={section.name}
+                            <DeleteActionButton
+                              onDelete={() => deleteSection(section.id)}
+                              itemName={section.name}
+                              title="Delete Section"
+                              description={`This action cannot be undone. This will permanently delete "${section.name}" and all lessons inside it.`}
+                              errorMessage="Failed to delete section"
+                              className="p-1.5 rounded-lg hover:bg-white/10 text-[#c9c8ab]/60 hover:text-red-500 transition-colors cursor-pointer disabled:opacity-50"
+                              iconClassName="w-3.5 h-3.5"
                             />
                           </div>
 
