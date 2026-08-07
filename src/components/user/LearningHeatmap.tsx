@@ -177,9 +177,7 @@ export default function LearningHeatmap({ activity, currentStreak }: Props) {
           </>
         ) : (
           <>
-            <p className="md:hidden">
-              Click on a day to check your activity
-            </p>
+            <p className="md:hidden">Click on a day to check your activity</p>
             <p className="hidden md:block">
               Hover over a day to see your activity.
             </p>
@@ -206,16 +204,6 @@ function getCellColor(seconds: number) {
   return "bg-brand-yellow";
 }
 
-function getDayLabel(dayIndex: number) {
-  if (dayIndex === 0) return "Mon";
-  if (dayIndex === 1) return "Tue";
-  if (dayIndex === 2) return "Wed";
-  if (dayIndex === 3) return "Thu";
-  if (dayIndex === 4) return "Fri";
-  if (dayIndex === 5) return "Sat";
-  if (dayIndex === 6) return "Sun";
-}
-
 function formatDate(date: Date) {
   const year = date.getFullYear();
 
@@ -224,15 +212,6 @@ function formatDate(date: Date) {
   const day = String(date.getDate()).padStart(2, "0");
 
   return `${year}-${month}-${day}`;
-}
-
-function getDateMonthLabel(date: Date) {
-  return date
-    .toLocaleDateString(undefined, {
-      month: "short",
-      year: "numeric",
-    })
-    .split(" ")[0];
 }
 
 function formatPrettyDate(date: string) {
