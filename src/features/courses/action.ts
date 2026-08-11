@@ -11,6 +11,9 @@ export const createCourse = async (courseData: Partial<Course>) => {
       [courseData.name, courseData.description],
     );
 
+    revalidatePath("/admin/courses");
+    revalidatePath("/admin");
+
     return {
       error: false,
       message: "Course created successfully",

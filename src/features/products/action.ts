@@ -49,6 +49,8 @@ export const createProduct = async (
 
     await db.query("COMMIT");
 
+    revalidatePath("/admin");
+
     return {
       error: false,
       message: "Product created successfully",
@@ -118,6 +120,8 @@ export const updateProduct = async (
     }
 
     await db.query("COMMIT");
+
+    revalidatePath("/admin");
 
     return {
       error: false,

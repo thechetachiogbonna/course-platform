@@ -34,17 +34,20 @@ export const createSection = async (sectionData: Omit<Section, "id">) => {
 
 export const updateSection = async (
   sectionId: string,
-  sectionData: Pick<Section, "name" | "status" | "order">
+  sectionData: Pick<Section, "name" | "status" | "order">,
+  courseId: string,
 ) => {
   try {
     await db.query(
       `UPDATE sections SET name = $1, status = $2, "order" = $3 WHERE id = $4`,
-      [sectionData.name, sectionData.status, sectionData.order, sectionId]
+      [sectionData.name, sectionData.status, sectionData.order, sectionId],
     );
+
+    revalidatePath(`/admin/courses/${courseId}/edit`);
 
     return {
       error: false,
-      message: "Section updated successfully"
+      message: "Section updated successfully",
     };
   } catch (error) {
     console.error("Error updating section:", error);
@@ -56,9 +59,11 @@ export const updateSection = async (
   }
 };
 
-export const deleteSection = async (sectionId: string) => {
+export const deleteSection = async (sectionId: string, courseId: string) => {
   try {
     await db.query(`DELETE FROM sections WHERE id = $1`, [sectionId]);
+
+    revalidatePath(`/admin/courses/${courseId}/edit`);
 
     return {
       error: false,
@@ -74,7 +79,10 @@ export const deleteSection = async (sectionId: string) => {
   }
 };
 
-export const updateSectionOrder = async (sectionIds: string[]) => {
+export const updateSectionOrder = async (
+  sectionIds: string[],
+  courseId: string,
+) => {
   try {
     await db.query(
       `
@@ -86,8 +94,10 @@ export const updateSectionOrder = async (sectionIds: string[]) => {
         ) i
         WHERE sections.id = i.id;
       `,
-      [sectionIds]
+      [sectionIds],
     );
+
+    revalidatePath(`/admin/courses/${courseId}/edit`);
 
     return {
       error: false,
@@ -98,7 +108,9 @@ export const updateSectionOrder = async (sectionIds: string[]) => {
     return {
       error: true,
       message:
-        error instanceof Error ? error.message : "Failed to change section order",
+        error instanceof Error
+          ? error.message
+          : "Failed to change section order",
     };
   }
 };

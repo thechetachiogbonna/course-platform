@@ -113,7 +113,10 @@ export const deleteLesson = async (lessonId: string) => {
   }
 };
 
-export const updateLessonOrder = async (lessonIds: string[]) => {
+export const updateLessonOrder = async (
+  lessonIds: string[],
+  courseId: string,
+) => {
   try {
     await db.query(
       `
@@ -127,6 +130,8 @@ export const updateLessonOrder = async (lessonIds: string[]) => {
       `,
       [lessonIds],
     );
+
+    revalidatePath(`/admin/courses/${courseId}/edit`);
 
     return {
       error: false,
@@ -149,7 +154,7 @@ export const updateLessonProgress = async (
   lessonId: string,
   currentTime: number,
   watchedSeconds: number,
-  completed: boolean
+  completed: boolean,
 ) => {
   const client = await db.connect();
 
@@ -175,7 +180,7 @@ export const updateLessonProgress = async (
         completed = $4,
         updated_at = NOW()
       `,
-      [userId, lessonId, currentTime, completed]
+      [userId, lessonId, currentTime, completed],
     );
 
     await client.query(
@@ -198,7 +203,7 @@ export const updateLessonProgress = async (
           EXCLUDED.seconds_watched,
         updated_at = NOW()
       `,
-      [userId, watchedSeconds]
+      [userId, watchedSeconds],
     );
 
     await client.query("COMMIT");

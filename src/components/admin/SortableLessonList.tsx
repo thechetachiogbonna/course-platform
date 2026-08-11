@@ -29,6 +29,7 @@ export default function SortableLessonList({
     <div className="divide-y divide-[#252525]/20">
       <SortableList
         lists={section.lessons}
+        courseId={section.courseId}
         orderChangeHandler={updateLessonOrder}
       >
         {(items, isPending) =>

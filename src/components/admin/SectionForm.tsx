@@ -53,7 +53,7 @@ type SectionFormProps = {
   section?: Section;
   children?: ReactNode;
   nextSectionOrder?: number;
-}
+};
 
 export default function SectionForm({
   type,
@@ -61,7 +61,7 @@ export default function SectionForm({
   courseId,
   children,
   section,
-  nextSectionOrder
+  nextSectionOrder,
 }: SectionFormProps) {
   const [open, setOpen] = useState(false);
   const form = useForm<SectionFormValues>({
@@ -76,7 +76,11 @@ export default function SectionForm({
     if (type === "create") {
       if (!nextSectionOrder) return;
 
-      const result = await createSection({ courseId, ...values, order: nextSectionOrder });
+      const result = await createSection({
+        courseId,
+        ...values,
+        order: nextSectionOrder,
+      });
       if (result.error) {
         toast.error(result.message);
       } else {
@@ -88,7 +92,11 @@ export default function SectionForm({
 
     if (type === "edit") {
       if (!section) return;
-      const result = await updateSection(section.id, { ...values, order: section.order });
+      const result = await updateSection(
+        section.id,
+        { ...values, order: section.order },
+        courseId,
+      );
       if (result.error) {
         toast.error(result.message);
       } else {
@@ -100,9 +108,7 @@ export default function SectionForm({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        {children}
-      </DialogTrigger>
+      <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent
         className={cn(dialogContentClassName, "max-w-xl")}
         showCloseButton={false}
@@ -119,7 +125,9 @@ export default function SectionForm({
               </div>
               <div>
                 <p className="text-[10px] font-bold tracking-widest text-[#c9c8ab] uppercase">
-                  {type === "create" ? "ADDING TO COURSE" : "EDITING SECTION IN"}
+                  {type === "create"
+                    ? "ADDING TO COURSE"
+                    : "EDITING SECTION IN"}
                 </p>
                 <p className="text-sm font-extrabold text-white">
                   {courseName}
@@ -179,9 +187,7 @@ export default function SectionForm({
                       </FormControl>
                       <SelectContent className="border-[#252525] bg-[#131313] text-white">
                         <SelectItem value="public">Public</SelectItem>
-                        <SelectItem value="private">
-                          Private (Draft)
-                        </SelectItem>
+                        <SelectItem value="private">Private (Draft)</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -196,7 +202,11 @@ export default function SectionForm({
                   className="flex h-auto flex-1 items-center justify-center gap-1.5 rounded-xl bg-brand-yellow py-3.5 text-xs font-bold tracking-wider text-[#1c1d00] uppercase shadow-[0_4px_12px_rgba(226,236,0,0.15)] hover:brightness-110 active:scale-95"
                 >
                   {form.formState.isSubmitting ? (
-                    type === "create" ? "Creating..." : "Saving..."
+                    type === "create" ? (
+                      "Creating..."
+                    ) : (
+                      "Saving..."
+                    )
                   ) : (
                     <>
                       {type === "create" ? (

@@ -39,7 +39,11 @@ export default function SortableSectionList({
 
   return (
     <div className="space-y-4">
-      <SortableList lists={sections} orderChangeHandler={updateSectionOrder}>
+      <SortableList
+        lists={sections}
+        courseId={course.id}
+        orderChangeHandler={updateSectionOrder}
+      >
         {(items, isPending) =>
           items.map((section, index) => {
             return (
@@ -104,7 +108,9 @@ export default function SortableSectionList({
                               </button>
                             </SectionForm>
                             <DeleteActionButton
-                              onDelete={() => deleteSection(section.id)}
+                              onDelete={() =>
+                                deleteSection(section.id, course.id)
+                              }
                               itemName={section.name}
                               title="Delete Section"
                               description={`This action cannot be undone. This will permanently delete "${section.name}" and all lessons inside it.`}
