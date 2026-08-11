@@ -28,9 +28,7 @@ export const createCourse = async (courseData: Partial<Course>) => {
 
 export const deleteCourse = async (courseId: string) => {
   try {
-    await db.query("BEGIN");
     await db.query("DELETE FROM courses WHERE id = $1", [courseId]);
-    await db.query("COMMIT");
 
     revalidatePath("/admin/courses");
     revalidatePath("/admin");
@@ -40,7 +38,6 @@ export const deleteCourse = async (courseId: string) => {
       message: "Course deleted successfully",
     };
   } catch (error) {
-    await db.query("ROLLBACK");
     console.error("Error deleting course:", error);
     return {
       error: true,
