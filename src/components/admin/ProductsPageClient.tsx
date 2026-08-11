@@ -4,6 +4,8 @@ import { Plus, Edit3, Layers, SlidersHorizontal } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import SearchInput from "@/components/SearchInput";
+import DeleteActionButton from "@/components/ui/DeleteActionButton";
+import { deleteProduct } from "@/features/products/action";
 
 interface Product {
   id: string;
@@ -22,15 +24,16 @@ export default function ProductsPageClient({
   products,
 }: ProductsPageClientProps) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [productList, setProductList] = useState(products);
 
   const filteredProducts = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
 
     if (!query) {
-      return products;
+      return productList;
     }
 
-    return products.filter((product) => {
+    return productList.filter((product) => {
       const haystack = [
         product.name,
         product.description ?? "",
@@ -41,17 +44,15 @@ export default function ProductsPageClient({
 
       return haystack.includes(query);
     });
-  }, [products, searchQuery]);
+  }, [productList, searchQuery]);
 
-  const totalSkus = products.length;
-  const publicListings = products.filter(
+  const totalProducts = productList.length;
+  const publicListings = productList.filter(
     (product) => product.status === "public",
   ).length;
-  const inventoryValue = products.reduce(
-    (sum, product) => sum + Number(product.price || 0),
-    0,
-  );
-  const formattedInventoryValue = `$${(inventoryValue / 1000).toFixed(1)}k`;
+  const privateListings = productList.filter(
+    (product) => product.status === "private",
+  ).length;
 
   return (
     <div className="flex-1 w-full space-y-8 pb-16">
@@ -66,15 +67,15 @@ export default function ProductsPageClient({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div className="bg-[#1a1a1a]/80 backdrop-blur-md border border-[#252525] p-5 rounded-2xl flex flex-col justify-between h-32 relative overflow-hidden group hover:border-brand-yellow/30 transition-all">
           <div className="absolute -right-4 -top-4 opacity-5 group-hover:opacity-10 transition-opacity text-white">
             <Layers className="w-24 h-24" />
           </div>
           <span className="text-xs font-bold text-[#c9c8ab] uppercase tracking-wider">
-            Total SKUs
+            Total Products
           </span>
-          <p className="text-4xl font-extrabold text-white">{totalSkus}</p>
+          <p className="text-4xl font-extrabold text-white">{totalProducts}</p>
         </div>
 
         <div className="bg-[#1a1a1a]/80 backdrop-blur-md border border-[#252525] p-5 rounded-2xl flex flex-col justify-between h-32 relative group hover:border-brand-yellow/30 transition-all">
@@ -88,10 +89,10 @@ export default function ProductsPageClient({
 
         <div className="bg-[#1a1a1a]/80 backdrop-blur-md border border-[#252525] p-5 rounded-2xl flex flex-col justify-between h-32 relative group hover:border-brand-yellow/30 transition-all">
           <span className="text-xs font-bold text-[#c9c8ab] uppercase tracking-wider">
-            Inventory Value
+            Private Listings
           </span>
           <p className="text-4xl font-extrabold text-white">
-            {formattedInventoryValue}
+            {privateListings}
           </p>
         </div>
       </div>
@@ -180,6 +181,23 @@ export default function ProductsPageClient({
                       <Edit3 className="w-3.5 h-3.5" />
                       Edit
                     </Link>
+                    <DeleteActionButton
+                      onDelete={async () => {
+                        const result = await deleteProduct(product.id);
+                        if (!result.error) {
+                          setProductList((current) =>
+                            current.filter((item) => item.id !== product.id),
+                          );
+                        }
+                        return result;
+                      }}
+                      itemName={product.name}
+                      title="Delete product"
+                      description={`This action cannot be undone. This will permanently delete "${product.name}" and its related product details.`}
+                      errorMessage="Failed to delete product"
+                      className="py-2.5 rounded-xl border border-[#353534] hover:bg-[#581d1d] hover:border-[#c9c8ab]/30 transition-all text-xs font-bold text-[#c8c6c5] flex items-center justify-center gap-1.5"
+                      iconClassName="w-3.5 h-3.5"
+                    />
                   </div>
                 </div>
               </div>
