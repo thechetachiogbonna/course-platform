@@ -1,10 +1,11 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Navigation from "@/components/user/Navigation";
 import { cn } from "@/lib/utils";
-import { UserButton } from "@clerk/nextjs";
+import { Show, SignInButton, UserButton } from "@clerk/nextjs";
 import { usePathname } from "next/navigation";
 
 export default function UserLayout({
@@ -13,6 +14,8 @@ export default function UserLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const lessonPage =
+    pathname.split("/")[1] === "courses" && pathname.includes("lesson");
 
   const defaultPages = new Map<string, boolean>([
     ["/", true],
@@ -31,7 +34,23 @@ export default function UserLayout({
             pathname.includes("lesson") && "top-10",
           )}
         >
-          <UserButton />
+          <Show when="signed-in">
+            <UserButton />
+          </Show>
+
+          {!lessonPage && (
+            <Show when="signed-out">
+              <SignInButton mode="redirect">
+                <Button
+                  variant="default"
+                  size="lg"
+                  className="bg-brand-yellow text-black hover:bg-brand-yellow/90 border-transparent shadow-[0_8px_24px_rgba(229,226,0,0.18)] px-4 py-2"
+                >
+                  Log In
+                </Button>
+              </SignInButton>
+            </Show>
+          )}
         </div>
         <main
           className={cn(

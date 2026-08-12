@@ -33,8 +33,6 @@ export default function YouTubeVideoPlayer(props: YoutubeVideoPlayerProps) {
     }
   };
 
-  console.log("using default yotube video player...");
-
   return (
     <YouTube
       videoId={props.videoId}
@@ -52,6 +50,8 @@ function YouTubeVideoPlayerWithProgress({
   stoppedAt,
   completed: initialCompleted,
 }: Prop1) {
+  if (!userId) return null;
+
   const playerRef = useRef<YouTubeEvent["target"]>(null);
   const lastPosition = useRef(0);
   const completed = useRef(initialCompleted);

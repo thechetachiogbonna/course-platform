@@ -1,10 +1,12 @@
 import YouTubeVideoPlayer from "@/components/admin/YoutubeVideoPlayer";
+import { Button } from "@/components/ui/button";
 import LessonPlayerSidebar from "@/components/user/LessonPlayerSidebar";
 import { db } from "@/database/db";
 import { userCanAccessCourse } from "@/features/courses/action";
 import { getCurrentUser } from "@/features/users/action";
 import { getUserCoupon } from "@/lib/user-country-header";
 import { formatDate, getCurrentStreak, formatPrice } from "@/lib/utils";
+import { SignInButton } from "@clerk/nextjs";
 import { Lock, Menu } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -196,17 +198,28 @@ export default async function LessonPage({
           </div>
 
           <div className="max-md:mr-8 flex px-4 py-1.5 bg-[#1c1b1b] rounded-full border border-[#252524]">
-            <span className="text-[11px] font-bold text-brand-yellow uppercase tracking-widest">
-              Streak:{" "}
-              {user ? `${streak} Days 🔥` : "Log in to access your streak"}
-            </span>
+            {user ? (
+              <span className="text-[11px] font-bold text-brand-yellow uppercase tracking-widest">
+                Streak: {streak} Days 🔥
+              </span>
+            ) : (
+              <SignInButton mode="redirect">
+                <Button
+                  variant="default"
+                  size="lg"
+                  className="bg-transparent text-brand-yellow hover:bg-brand-yellow/10 border border-brand-yellow shadow-[0_8px_24px_rgba(229,226,0,0.18)] px-4 py-2"
+                >
+                  Log In
+                </Button>
+              </SignInButton>
+            )}
           </div>
         </header>
 
         {!activeLesson ? (
           notFoundLessonContent
         ) : (
-          <div className="pt-10 p-6 md:p-8 flex-1 flex flex-col gap-8 pb-32 w-full max-w-4xl mx-auto overflow-y-auto">
+          <div className="pt-16 p-6 md:p-8 flex-1 flex flex-col gap-8 pb-32 w-full max-w-4xl mx-auto overflow-y-auto">
             {/* Video Container */}
             <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-black electric-glow-large border border-white/5 group shadow-2xl">
               {activeLesson.status !== "preview" && !canAccessCourse ? (
@@ -228,7 +241,7 @@ export default async function LessonPage({
 
                   {/* Interactive Action Button */}
                   <Link
-                    href={`/products/${course.productId}`}
+                    href={`/products/${course.productId}/purchase`}
                     className="inline-flex items-center justify-center bg-brand-yellow hover:brightness-110 active:scale-95 text-black px-6 py-3 rounded-xl font-bold text-xs tracking-wide uppercase transition-all shadow-[0_4px_20px_rgba(198,207,0,0.25)]"
                   >
                     Unlock Course for {formatPrice(course.productPrice)}
