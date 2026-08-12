@@ -8,6 +8,10 @@ const isPublicRoute = createRouteMatcher([
   "/sign-up(.*)",
   "/api/webhooks/clerk(.*)",
   "/api/webhooks/stripe(.*)",
+  "/courses/:courseId",
+  "/courses/:courseId/lessons/:lessonId",
+  "/",
+  "/products/:productId",
 ]);
 
 const isAdminRoute = createRouteMatcher(["/admin(.*)"]);

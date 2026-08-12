@@ -3,8 +3,9 @@
 import { LayoutDashboard, Boxes, BookOpen, Settings } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { UserButton, useUser } from "@clerk/nextjs";
+import { UserButton, useUser, Show, SignInButton } from "@clerk/nextjs";
 import { Sidebar, SidebarContent } from "../ui/sidebar";
+import { Button } from "../ui/button";
 
 export default function Navigation() {
   const mainNavItems = [
@@ -105,20 +106,35 @@ export default function Navigation() {
               </div>
 
               {/* Profile Card */}
-              <div className="px-4 mb-6">
-                <div className="flex items-center gap-3 p-3 rounded-xl bg-[#201f1f] border border-[#2d2a2a]">
-                  <UserButton />
+              <Show when="signed-in">
+                <div className="px-4 mb-6">
+                  <div className="flex items-center gap-3 p-3 rounded-xl bg-[#201f1f] border border-[#2d2a2a]">
+                    <UserButton />
 
-                  <div className="truncate">
-                    <p className="font-semibold text-sm text-white truncate">
-                      {user?.firstName} {user?.lastName}
-                    </p>
-                    <p className="text-xs text-[#c9c8ab] font-medium truncate">
-                      {user?.emailAddresses[0].emailAddress}
-                    </p>
+                    <div className="truncate">
+                      <p className="font-semibold text-sm text-white truncate">
+                        {user?.firstName} {user?.lastName}
+                      </p>
+                      <p className="text-xs text-[#c9c8ab] font-medium truncate">
+                        {user?.emailAddresses[0].emailAddress}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
+              </Show>
+
+              <Show when="signed-out">
+                <div className="px-4 mb-6">
+                  <SignInButton mode="modal">
+                    <Button
+                      variant="outline"
+                      className="w-full bg-brand-yellow/10 text-brand-yellow hover:text-brand-yellow hover:bg-brand-yellow/20"
+                    >
+                      Log In
+                    </Button>
+                  </SignInButton>
+                </div>
+              </Show>
 
               {/* Main Navigation Items */}
               <nav className="grow space-y-3 px-2">
@@ -131,20 +147,53 @@ export default function Navigation() {
                     ? item.id === currentPath
                     : item.id === "products";
 
-                  return (
+                  if (user) {
+                    return (
+                      <Link
+                        key={item.id}
+                        className={`w-full flex items-center gap-3 py-3 px-4 rounded-xl transition-all duration-200 text-left ${
+                          isSelected
+                            ? "bg-brand-yellow text-[#1c1d00] font-bold shadow-[0_4px_12px_rgba(226,236,0,0.2)]"
+                            : "text-[#c8c6c5] hover:text-white hover:bg-[#252524]"
+                        }`}
+                        href={item.href}
+                      >
+                        <Icon className="w-5 h-5 shrink-0" />
+                        <span className="text-sm font-medium">
+                          {item.label}
+                        </span>
+                      </Link>
+                    );
+                  }
+
+                  return item.id === "products" ? (
                     <Link
+                      key={item.id}
                       className={`w-full flex items-center gap-3 py-3 px-4 rounded-xl transition-all duration-200 text-left ${
                         isSelected
                           ? "bg-brand-yellow text-[#1c1d00] font-bold shadow-[0_4px_12px_rgba(226,236,0,0.2)]"
                           : "text-[#c8c6c5] hover:text-white hover:bg-[#252524]"
                       }`}
                       href={item.href}
-                      key={item.id}
-                      id={`nav-${item.id}`}
                     >
                       <Icon className="w-5 h-5 shrink-0" />
                       <span className="text-sm font-medium">{item.label}</span>
                     </Link>
+                  ) : (
+                    <SignInButton key={item.id} mode="modal">
+                      <button
+                        className={`w-full flex items-center gap-3 py-3 px-4 rounded-xl transition-all duration-200 text-left ${
+                          isSelected
+                            ? "bg-brand-yellow text-[#1c1d00] font-bold shadow-[0_4px_12px_rgba(226,236,0,0.2)]"
+                            : "text-[#c8c6c5] hover:text-white hover:bg-[#252524]"
+                        }`}
+                      >
+                        <Icon className="w-5 h-5 shrink-0" />
+                        <span className="text-sm font-medium">
+                          {item.label}
+                        </span>
+                      </button>
+                    </SignInButton>
                   );
                 })}
               </nav>

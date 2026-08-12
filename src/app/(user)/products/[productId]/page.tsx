@@ -131,7 +131,7 @@ export default async function ProductDetailPage({
     0,
   );
 
-  const ownsProduct = await userOwnsProduct(user.id, productId);
+  const ownsProduct = user ? await userOwnsProduct(user.id, productId) : false;
 
   return (
     <div className="w-full max-w-5xl mx-auto pb-28">

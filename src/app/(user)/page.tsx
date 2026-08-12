@@ -24,7 +24,7 @@ const getPublicProducts = async () => {
 };
 
 async function page() {
-  const [products, user, coupon] = await Promise.all([
+  const [products, { user }, coupon] = await Promise.all([
     getPublicProducts(),
     getCurrentUser(),
     getUserCoupon(),
@@ -32,7 +32,14 @@ async function page() {
 
   const productsWithUserAccess = await Promise.all(
     products.map(async (p) => {
-      const hasPurchased = await userOwnsProduct(user.user.id, p.id);
+      if (!user) {
+        return {
+          ...p,
+          hasPurchased: false,
+        };
+      }
+
+      const hasPurchased = await userOwnsProduct(user.id, p.id);
       return {
         ...p,
         hasPurchased,

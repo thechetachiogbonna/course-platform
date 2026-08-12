@@ -7,10 +7,10 @@ import YouTube, { YouTubeEvent } from "react-youtube";
 type Prop1 = {
   action: true;
   videoId: string;
-  userId: string;
+  userId: string | null;
   lessonId: string;
   stoppedAt: number;
-  completed: boolean
+  completed: boolean;
 };
 
 type Prop2 = {
@@ -22,14 +22,18 @@ type Prop2 = {
 type YoutubeVideoPlayerProps = Prop1 | Prop2;
 
 export default function YouTubeVideoPlayer(props: YoutubeVideoPlayerProps) {
-  if (props.action) {
+  if (props.action && props.userId) {
     return <YouTubeVideoPlayerWithProgress {...props} />;
   }
 
   const onReady = (event: YouTubeEvent) => {
-    const duration = Math.floor(event.target.getDuration());
-    props.setLessonDuration(duration);
-  }
+    if ("setLessonDuration" in props) {
+      const duration = Math.floor(event.target.getDuration());
+      props.setLessonDuration(duration);
+    }
+  };
+
+  console.log("using default yotube video player...");
 
   return (
     <YouTube
@@ -46,8 +50,8 @@ function YouTubeVideoPlayerWithProgress({
   userId,
   lessonId,
   stoppedAt,
-  completed: initialCompleted
-}: Prop1) {  
+  completed: initialCompleted,
+}: Prop1) {
   const playerRef = useRef<YouTubeEvent["target"]>(null);
   const lastPosition = useRef(0);
   const completed = useRef(initialCompleted);
@@ -62,7 +66,13 @@ function YouTubeVideoPlayerWithProgress({
 
     const watchedSeconds = currentTime - lastPosition.current;
 
-    await updateLessonProgress(userId, lessonId, currentTime, watchedSeconds, completed.current);
+    await updateLessonProgress(
+      userId,
+      lessonId,
+      currentTime,
+      watchedSeconds,
+      completed.current,
+    );
     lastPosition.current = currentTime;
   };
 
@@ -83,8 +93,8 @@ function YouTubeVideoPlayerWithProgress({
         lessonId,
         currentTime,
         watchedSeconds,
-        completed: completed.current
-      })
+        completed: completed.current,
+      }),
     );
   };
 
@@ -100,17 +110,17 @@ function YouTubeVideoPlayerWithProgress({
         }
       }
     };
-    
+
     const handlePageHide = () => {
       sendProgressBeacon();
     };
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
     window.addEventListener("pagehide", handlePageHide);
-    
+
     return () => {
       sendProgressBeacon();
-      
+
       document.removeEventListener("visibilitychange", handleVisibilityChange);
       window.removeEventListener("pagehide", handlePageHide);
     };

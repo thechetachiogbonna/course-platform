@@ -3,6 +3,7 @@ import MyCoursesList from "@/components/user/MyCoursesList";
 import { db } from "@/database/db";
 import { getCurrentUser } from "@/features/users/action";
 import { formatDate, getCurrentStreak } from "@/lib/utils";
+import { redirect } from "next/navigation";
 
 const getMyCourses = async (userId: string) => {
   const result = await db.query(
@@ -59,6 +60,8 @@ const getUserDailyActivity = async (userId: string) => {
 
 export default async function CoursesPage() {
   const { user } = await getCurrentUser();
+
+  if (!user) return redirect("/sign-in");
 
   const [coursesResult, activityResult] = await Promise.allSettled([
     getMyCourses(user.id),

@@ -106,22 +106,22 @@ export const syncDBUserToClerk = async ({
 };
 
 export async function getCurrentUser() {
-  const { userId, sessionClaims: _, redirectToSignIn } = await auth()
+  const { userId } = await auth();
 
-  if (!userId) return redirectToSignIn()
+  if (!userId) return { user: null };
 
-  const user = await getUser(userId)
+  const user = await getUser(userId);
 
   return {
-    user
-  }
+    user,
+  };
 }
 
 async function getUser(clerkUserId: string) {
   const result = await db.query(
     "SELECT * FROM users WHERE clerk_user_id = $1",
     [clerkUserId],
-  )
+  );
 
-  return result.rows[0] as User
+  return result.rows[0] as User;
 }

@@ -202,7 +202,7 @@ export const userOwnsProduct = async (userId: string, productId: string) => {
             SELECT 
                 *
             FROM purchases
-            WHERE user_id = $1 AND product_id = $2
+            WHERE user_id = $1 AND product_id = $2 AND refunded_at IS NULL
         `,
       [userId, productId],
     );

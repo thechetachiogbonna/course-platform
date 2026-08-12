@@ -14,7 +14,7 @@ interface CourseDetails extends Course {
   sections: (Section & { lessons: LessonWithLastWatched[] })[];
 }
 
-const getCourse = async (courseId: string, userId: string) => {
+const getCourse = async (courseId: string, userId: string | null) => {
   const result = await db.query(
     `
       SELECT
@@ -109,7 +109,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { courseId } = await params;
   const { user } = await getCurrentUser();
-  const course = await getCourse(courseId, user.id);
+  const course = await getCourse(courseId, user?.id ?? null);
   if (!course) {
     return {
       title: "Course Not Found",
@@ -128,7 +128,7 @@ export default async function CourseDetailPage({
 }) {
   const { courseId } = await params;
   const { user } = await getCurrentUser();
-  const course = await getCourse(courseId, user.id);
+  const course = await getCourse(courseId, user?.id ?? null);
   if (!course) notFound();
 
   const totalLessons = course.sections?.reduce(
@@ -155,7 +155,7 @@ export default async function CourseDetailPage({
   const heroImage = `https://img.youtube.com/vi/${currentLesson.youtubeVideoId}/maxresdefault.jpg`;
 
   const actionText = lastWatchedLesson ? "Continue Learning" : "Start Learning";
-  
+
   return (
     <div className="w-full max-w-5xl mx-auto pb-28">
       <section className="relative w-full h-[50dvh] md:h-100 rounded-2xl overflow-hidden mb-8 mx-0">

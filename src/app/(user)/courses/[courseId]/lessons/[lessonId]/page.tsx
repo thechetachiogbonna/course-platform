@@ -20,7 +20,10 @@ interface CourseDetails extends CourseWithProduct {
   })[];
 }
 
-const getCourseSectionsLessons = async (courseId: string, userId: string) => {
+const getCourseSectionsLessons = async (
+  courseId: string,
+  userId: string | null,
+) => {
   const result = await db.query(
     `
       SELECT
@@ -108,7 +111,7 @@ const getCourseSectionsLessons = async (courseId: string, userId: string) => {
         status: row.lesson_status,
         order: row.lesson_order,
         duration: Number(row.lesson_duration || 0),
-        progressInSeconds: row.progress_seconds,
+        progressInSeconds: row.progress_seconds || 0,
         completed: row.completed || false,
       });
     }
@@ -145,9 +148,9 @@ export default async function LessonPage({
   const { lessonId, courseId } = await params;
   const { user } = await getCurrentUser();
   const [course, streak, canAccessCourse] = await Promise.all([
-    getCourseSectionsLessons(courseId, user.id),
-    getUserStreak(user.id),
-    userCanAccessCourse(user.id, courseId),
+    getCourseSectionsLessons(courseId, user?.id ?? null),
+    user ? getUserStreak(user.id) : Promise.resolve(0),
+    user ? userCanAccessCourse(user.id, courseId) : Promise.resolve(false),
   ]);
 
   if (!course) return notFound();
@@ -194,7 +197,8 @@ export default async function LessonPage({
 
           <div className="max-md:mr-8 flex px-4 py-1.5 bg-[#1c1b1b] rounded-full border border-[#252524]">
             <span className="text-[11px] font-bold text-brand-yellow uppercase tracking-widest">
-              Streak: {streak} Days 🔥
+              Streak:{" "}
+              {user ? `${streak} Days 🔥` : "Log in to access your streak"}
             </span>
           </div>
         </header>
@@ -233,7 +237,7 @@ export default async function LessonPage({
               ) : (
                 <YouTubeVideoPlayer
                   action={true}
-                  userId={user.id}
+                  userId={user?.id ?? null}
                   lessonId={activeLesson.id}
                   videoId={activeLesson?.youtubeVideoId}
                   stoppedAt={activeLesson?.progressInSeconds || 0}

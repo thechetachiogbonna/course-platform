@@ -35,7 +35,11 @@ export default async function PurchasePage({
 
   if (!product) return notFound();
 
-  if (await userOwnsProduct(user.id, productId)) {
+  if (!user) redirect(`/sign-in?redirect_url=/products/${productId}/purchase`);
+
+  const ownsProduct = await userOwnsProduct(user.id, productId);
+
+  if (ownsProduct) {
     return redirect("/");
   }
 
