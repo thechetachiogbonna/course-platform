@@ -209,22 +209,38 @@ export default function Navigation() {
       >
         {mainNavItems.map((item) => {
           const Icon = item.icon;
-          const isSelected = pathname === item.href;
+          const currentPath = pathname.split("/")[1];
+          const isSelected = currentPath
+            ? item.id === currentPath
+            : item.id === "products";
 
-          return (
-            <button key={item.id} id={`m-nav-${item.id}`}>
-              <Link
-                className={`flex flex-col items-center justify-center transition-all ${
-                  isSelected
-                    ? "text-brand-yellow bg-brand-yellow/10 px-3 py-1 rounded-full"
-                    : "text-gray-400 opacity-60 hover:opacity-100"
-                }`}
-                href={item.href}
-              >
+          const linkClass = `flex flex-col items-center justify-center transition-all ${
+            isSelected
+              ? "text-brand-yellow bg-brand-yellow/10 px-3 py-1 rounded-full"
+              : "text-gray-400 opacity-60 hover:opacity-100"
+          }`;
+
+          if (user) {
+            return (
+              <Link key={item.id} id={`m-nav-${item.id}`} className={linkClass} href={item.href}>
                 <Icon className="w-5 h-5" />
                 <span className="text-[10px] font-bold mt-1">{item.label}</span>
               </Link>
-            </button>
+            );
+          }
+
+          return item.id === "products" ? (
+            <Link key={item.id} id={`m-nav-${item.id}`} className={linkClass} href={item.href}>
+              <Icon className="w-5 h-5" />
+              <span className="text-[10px] font-bold mt-1">{item.label}</span>
+            </Link>
+          ) : (
+            <SignInButton key={item.id} mode="modal">
+              <button id={`m-nav-${item.id}`} className={linkClass}>
+                <Icon className="w-5 h-5" />
+                <span className="text-[10px] font-bold mt-1">{item.label}</span>
+              </button>
+            </SignInButton>
           );
         })}
       </nav>
