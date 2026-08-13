@@ -51,12 +51,12 @@ export default clerkMiddleware(async (auth, req) => {
     return new NextResponse(null, { status: 403 });
   }
 
-  // if (isAdminRoute(req)) {
-  //   const user = await auth.protect();
-  //   if (user.sessionClaims.role !== "admin") {
-  //     return new NextResponse(null, { status: 404 });
-  //   }
-  // }
+  if (isAdminRoute(req)) {
+    const user = await auth.protect();
+    if (user.sessionClaims.role !== "admin") {
+      return new NextResponse(null, { status: 404 });
+    }
+  }
 
   if (!isPublicRoute(req)) {
     await auth.protect();
