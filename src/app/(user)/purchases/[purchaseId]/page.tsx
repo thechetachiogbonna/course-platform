@@ -15,7 +15,7 @@ import {
 import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { stripe } from "@/config/stripe";
 
 export const metadata: Metadata = {
@@ -132,6 +132,13 @@ export default async function PurchaseReceiptPage({
 }) {
   const { purchaseId } = await params;
   const { user } = await getCurrentUser();
+
+  if (!user) {
+    return redirect(
+      `/sign-in?redirect_url=${encodeURIComponent(`/purchases/${purchaseId}`)}`,
+    );
+  }
+
   const purchase = await getPurchase(purchaseId, user.id);
 
   if (!purchase) return notFound();
