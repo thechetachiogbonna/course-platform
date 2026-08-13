@@ -11,6 +11,7 @@ import {
 import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "My Purchases",
@@ -87,6 +88,11 @@ const truncateSessionId = (sessionId: string) => {
 
 export default async function PurchasesPage() {
   const { user } = await getCurrentUser();
+
+  if (!user)
+    return redirect(
+      `/sign-in?redirect_url=${encodeURIComponent("/purchases")}`,
+    );
   const purchases = await getUserPurchases(user.id);
 
   const totalSpent = purchases

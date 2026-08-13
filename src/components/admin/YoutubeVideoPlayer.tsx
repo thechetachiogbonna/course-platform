@@ -16,7 +16,7 @@ type Prop1 = {
 type Prop2 = {
   action: false;
   videoId: string;
-  setLessonDuration: (duration: number) => void;
+  setLessonDuration?: (duration: number) => void;
 };
 
 type YoutubeVideoPlayerProps = Prop1 | Prop2;
@@ -27,7 +27,10 @@ export default function YouTubeVideoPlayer(props: YoutubeVideoPlayerProps) {
   }
 
   const onReady = (event: YouTubeEvent) => {
-    if ("setLessonDuration" in props) {
+    if (
+      "setLessonDuration" in props &&
+      typeof props.setLessonDuration === "function"
+    ) {
       const duration = Math.floor(event.target.getDuration());
       props.setLessonDuration(duration);
     }

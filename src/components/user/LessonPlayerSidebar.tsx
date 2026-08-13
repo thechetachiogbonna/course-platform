@@ -86,7 +86,7 @@ export default function LessonPlayerSidebar({
     totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
 
   return (
-    <aside className="w-[25%]">
+    <aside className="w-0 md:w-[25%]">
       <div
         className={cn(
           "fixed top-0 h-screen z-50 w-[85vw] md:w-[25%] md:fixed md:translate-x-0",

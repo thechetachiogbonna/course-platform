@@ -174,7 +174,7 @@ export default async function LessonPage({
   );
 
   return (
-    <div className="-mx-4 -my-6 flex flex-row h-screen w-[calc(100%+2rem)] bg-background-dark text-[#e5e2e1] overflow-hidden!">
+    <div className="flex flex-row min-h-screen w-full bg-background-dark text-[#e5e2e1]">
       <LessonPlayerSidebar
         activeLessonId={lessonId}
         courseId={courseId}
@@ -182,7 +182,7 @@ export default async function LessonPage({
         sections={course.sections}
       />
 
-      <div className="w-full md:w-[75%] relative flex-1 flex flex-col min-h-screen overflow-hidden custom-scrollbar">
+      <div className="w-full md:w-[75%] relative flex-1 flex flex-col min-h-screen custom-scrollbar">
         {/* Top App Bar */}
         <header className="fixed left-0 md:left-[30%] right-0 top-0 z-40 flex justify-between items-center px-6 py-4 bg-[#131313]/90 backdrop-blur-xl border-b border-[#252524]">
           <div className="flex items-center gap-6">
@@ -219,9 +219,9 @@ export default async function LessonPage({
         {!activeLesson ? (
           notFoundLessonContent
         ) : (
-          <div className="w-full md:w-[90%] pt-40 p-6 md:p-8 flex-1 flex flex-col gap-8 pb-32 max-w-4xl mx-auto overflow-y-auto">
+          <div className="min-h-screen w-full pt-16 pb-16 flex-1 flex flex-col gap-8 max-w-4xl mx-auto px-4 md:px-0">
             {/* Video Container */}
-            <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-black electric-glow-large border border-white/5 group shadow-2xl">
+            <div className="relative w-full md:w-[90%] mx-auto aspect-video rounded-2xl bg-black electric-glow-large border border-white/5 group shadow-2xl">
               {activeLesson.status !== "preview" && !canAccessCourse ? (
                 <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0c0c0c]/95 backdrop-blur-md p-6 md:p-8 text-center select-none">
                   {/* Glowing Lock Icon Container */}
@@ -247,20 +247,26 @@ export default async function LessonPage({
                     Unlock Course for {formatPrice(course.productPrice)}
                   </Link>
                 </div>
-              ) : (
+              ) : user ? (
                 <YouTubeVideoPlayer
                   action={true}
-                  userId={user?.id ?? null}
+                  userId={user.id}
                   lessonId={activeLesson.id}
                   videoId={activeLesson?.youtubeVideoId}
                   stoppedAt={activeLesson?.progressInSeconds || 0}
                   completed={activeLesson?.completed || false}
                 />
+              ) : (
+                <YouTubeVideoPlayer
+                  action={false}
+                  videoId={activeLesson?.youtubeVideoId}
+                  setLessonDuration={undefined}
+                />
               )}
             </div>
 
             {/* Info Section with Tabs */}
-            <div className="space-y-8">
+            <div className="space-y-8 w-full md:w-[90%] mx-auto">
               <div className="border-b border-[#252524] overflow-x-auto no-scrollbar">
                 <div className="w-fit pb-4 font-semibold text-sm whitespace-nowrap transition-all duration-200 border-b-[3px] border-brand-yellow text-white">
                   Description
@@ -272,6 +278,15 @@ export default async function LessonPage({
                 </h3>
                 <div className="prose prose-invert max-w-none text-[#c9c8ab] space-y-5 text-base leading-relaxed">
                   <p>{activeLesson.description}</p>
+                  <p></p>
+                  Lorem ipsum dolor sit amet consectetur, adipisicing elit.
+                  Voluptas soluta obcaecati illo, voluptatibus optio accusamus
+                  quasi dolorum tenetur id itaque sint provident fuga tempore
+                  assumenda, dolore alias rerum magnam corporis. Omnis pariatur
+                  dolor molestiae voluptate eaque voluptates itaque, quia, iure
+                  similique blanditiis asperiores, ex aperiam id inventore
+                  magnam rem nulla debitis repellat modi alias tempore delectus
+                  voluptas atque. Id, voluptates?
                 </div>
               </div>
             </div>
