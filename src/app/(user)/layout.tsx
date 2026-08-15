@@ -29,9 +29,9 @@ export default function UserLayout({
         <Navigation />
         <div
           className={cn(
-            "absolute top-6 right-6 z-50 md:hidden",
+            "fixed top-6 right-6 z-50 md:hidden",
             !defaultPages.has(pathname) && "top-3",
-            pathname.includes("lesson") && "top-10",
+            pathname.includes("lesson") && "top-4.5",
           )}
         >
           <Show when="signed-in">

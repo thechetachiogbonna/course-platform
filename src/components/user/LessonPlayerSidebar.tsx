@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -30,6 +31,13 @@ export default function LessonPlayerSidebar({
 }: LessonPlayerSidebarProps) {
   const [isOpen, setIsOpen] = useState(false);
 
+  // A portal target only exists after mount (no `document` on the server),
+  // so gate rendering the portal until then.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const [openSections, setOpenSections] = useState<Record<string, boolean>>(
     () => Object.fromEntries(sections.map((section) => [section.id, true])),
   );
@@ -47,6 +55,19 @@ export default function LessonPlayerSidebar({
       button?.removeEventListener("click", handleClick);
     };
   }, []);
+
+  // Lock body scroll while the mobile drawer is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
 
   const getLessonIcon = ({
     completed,
@@ -85,14 +106,30 @@ export default function LessonPlayerSidebar({
   const progress =
     totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
 
-  return (
-    <aside className="w-0 md:w-[25%]">
+  if (!mounted) return null;
+
+  return createPortal(
+    <>
+      {/* Backdrop overlay for mobile drawer */}
       <div
+        onClick={() => setIsOpen(false)}
+        aria-hidden="true"
         className={cn(
-          "fixed top-0 h-screen z-50 w-[85vw] md:w-[25%] md:fixed md:translate-x-0",
-          "bg-[#161615] border-r border-[#252524] overflow-hidden",
+          "fixed inset-0 z-40 bg-black/60 backdrop-blur-sm transition-opacity duration-300 md:hidden",
+          isOpen
+            ? "opacity-100 pointer-events-auto"
+            : "opacity-0 pointer-events-none",
+        )}
+      />
+
+      <aside
+        className={cn(
+          "sticky inset-y-0 left-0 z-50 h-screen",
+          "w-[85vw] max-w-xs md:w-80 md:max-w-none",
+          "bg-[#161615] border-r border-[#252524] overflow-hidden flex flex-col",
           "transition-transform duration-300 ease-out",
           isOpen ? "translate-x-0" : "-translate-x-full",
+          "md:translate-x-0",
         )}
       >
         {/* Header */}
@@ -175,6 +212,7 @@ export default function LessonPlayerSidebar({
                       <Link
                         key={lesson.id}
                         href={`/courses/${courseId}/lessons/${lesson.id}`}
+                        onClick={() => setIsOpen(false)}
                         className={cn(
                           "w-full flex items-center gap-3 p-3 rounded-lg transition-all group",
                           isActive
@@ -214,7 +252,8 @@ export default function LessonPlayerSidebar({
             </div>
           ))}
         </div>
-      </div>
-    </aside>
+      </aside>
+    </>,
+    document.body,
   );
 }

@@ -174,7 +174,7 @@ export default async function LessonPage({
   );
 
   return (
-    <div className="flex flex-row min-h-screen w-full bg-background-dark text-[#e5e2e1]">
+    <div className="min-h-screen w-full bg-background-dark text-[#e5e2e1]">
       <LessonPlayerSidebar
         activeLessonId={lessonId}
         courseId={courseId}
@@ -182,9 +182,9 @@ export default async function LessonPage({
         sections={course.sections}
       />
 
-      <div className="w-full md:w-[75%] relative flex-1 flex flex-col min-h-screen custom-scrollbar">
+      <div className="md:pl-60 flex flex-col custom-scrollbar">
         {/* Top App Bar */}
-        <header className="fixed left-0 md:left-[30%] right-0 top-0 z-40 flex justify-between items-center px-6 py-4 bg-[#131313]/90 backdrop-blur-xl border-b border-[#252524]">
+        <header className="fixed left-0 right-0 top-0 z-30 flex justify-between items-center px-6 py-4 bg-[#131313]/90 backdrop-blur-xl border-b border-[#252524]">
           <div className="flex items-center gap-6">
             <Menu
               id="menu-btn"
@@ -219,7 +219,7 @@ export default async function LessonPage({
         {!activeLesson ? (
           notFoundLessonContent
         ) : (
-          <div className="min-h-screen w-full pt-16 pb-16 flex-1 flex flex-col gap-8 max-w-4xl mx-auto px-4 md:px-0">
+          <div className="w-full pt-8 flex-1 flex flex-col gap-8 max-w-4xl mx-auto px-4 md:px-0">
             {/* Video Container */}
             <div className="relative w-full md:w-[90%] mx-auto aspect-video rounded-2xl bg-black electric-glow-large border border-white/5 group shadow-2xl">
               {activeLesson.status !== "preview" && !canAccessCourse ? (
@@ -278,15 +278,6 @@ export default async function LessonPage({
                 </h3>
                 <div className="prose prose-invert max-w-none text-[#c9c8ab] space-y-5 text-base leading-relaxed">
                   <p>{activeLesson.description}</p>
-                  <p></p>
-                  Lorem ipsum dolor sit amet consectetur, adipisicing elit.
-                  Voluptas soluta obcaecati illo, voluptatibus optio accusamus
-                  quasi dolorum tenetur id itaque sint provident fuga tempore
-                  assumenda, dolore alias rerum magnam corporis. Omnis pariatur
-                  dolor molestiae voluptate eaque voluptates itaque, quia, iure
-                  similique blanditiis asperiores, ex aperiam id inventore
-                  magnam rem nulla debitis repellat modi alias tempore delectus
-                  voluptas atque. Id, voluptates?
                 </div>
               </div>
             </div>
