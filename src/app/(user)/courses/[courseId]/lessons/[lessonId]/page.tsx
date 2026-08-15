@@ -184,14 +184,14 @@ export default async function LessonPage({
 
       <div className="md:pl-60 flex flex-col custom-scrollbar">
         {/* Top App Bar */}
-        <header className="fixed left-0 right-0 top-0 z-30 flex justify-between items-center px-6 py-4 bg-[#131313]/90 backdrop-blur-xl border-b border-[#252524]">
+        <header className="fixed left-0 md:left-80 right-0 top-0 z-30 flex justify-between items-center px-6 py-4 bg-[#131313]/90 backdrop-blur-xl border-b border-[#252524]">
           <div className="flex items-center gap-6">
             <Menu
               id="menu-btn"
               className="w-5 h-5 md:hidden cursor-pointer text-[#c9c8ab] hover:text-white transition-colors"
             />
             <div className="hidden md:flex items-center gap-3">
-              <span className="text-xs font-medium text-[#e5e2e1]">
+              <span className="text-xs font-medium text-[#e5e2e1] line-clamp-1">
                 {activeLesson?.name ?? "Lesson Unavailable"}
               </span>
             </div>
@@ -199,7 +199,7 @@ export default async function LessonPage({
 
           <div className="max-md:mr-8 flex px-4 py-1.5 bg-[#1c1b1b] rounded-full border border-[#252524]">
             {user ? (
-              <span className="text-[11px] font-bold text-brand-yellow uppercase tracking-widest">
+              <span className="text-nowrap text-[11px] font-bold text-brand-yellow uppercase tracking-widest">
                 Streak: {streak} Days 🔥
               </span>
             ) : (
